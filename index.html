@@ -97,7 +97,7 @@ body{
   background:var(--marble) center/cover, var(--parch); color:var(--text); width:100%; max-width:680px; box-sizing:border-box;
   padding:22px 24px; border-radius:4px; display:flex; flex-direction:column; gap:14px;
   box-shadow:0 0 0 3px var(--night), 0 0 0 6px var(--parch2), 0 0 0 8px var(--night), 0 20px 50px rgba(0,0,0,.55);
-  user-select:text; -webkit-user-select:text;
+  user-select:text; -webkit-user-select:text; color-scheme:light;
 }
 .card.wide{max-width:820px}
 .eyebrow{font:600 13px/1.2 var(--f-display); letter-spacing:.12em; text-transform:uppercase; color:var(--blue)}
@@ -172,8 +172,11 @@ p{margin:0; line-height:1.5; font-size:16.5px; max-width:62ch}
 .tally .sum{font-weight:700; border-top:2px solid var(--night); padding-top:4px}
 input[type=text]{
   font:600 18px/1 var(--f-display); padding:10px 12px; border:3px solid var(--night); border-radius:4px;
-  background:#fff; color:var(--text); width:220px; max-width:100%; box-sizing:border-box
+  background:#fff; color:#0d1a3f; -webkit-text-fill-color:#0d1a3f; caret-color:#0d1a3f; color-scheme:light;
+  width:220px; max-width:100%; box-sizing:border-box; -webkit-user-select:text; user-select:text
 }
+input[type=text]::placeholder{color:#7a86a6; -webkit-text-fill-color:#7a86a6; opacity:1}
+input[type=text]:-webkit-autofill{-webkit-box-shadow:0 0 0 40px #fff inset; -webkit-text-fill-color:#0d1a3f}
 .scores{overflow-x:auto}
 table{border-collapse:collapse; width:100%; font-variant-numeric:tabular-nums}
 th,td{padding:7px 8px; text-align:left; border-bottom:1px solid rgba(20,40,94,.18); font-size:15.5px}
@@ -238,7 +241,7 @@ ul.help{margin:0; padding-left:20px; line-height:1.55; font-size:16px}
       <li>Dein Held trägt einen <b>Bleistift</b>. Mit dem Knopf <b>HIEB</b> (am PC <kbd>X</kbd> oder <kbd>Enter</kbd>) schlägst du damit zu.</li>
       <li>Sammle die <b>Bits</b> (0 und 1). Störenfriede wie Rauschen, Funken, Bugs und Glitches erledigst du mit dem Bleistift oder springst drauf.</li>
       <li>In jeder Welt liegen vier Aufgaben am Weg: Schriftrollen, Telegramme, Disketten und Schaltpläne. Erst wenn alle vier gelöst sind, öffnet sich das Tor.</li>
-      <li>Hinter dem Tor warten die Hüter der Welt mit drei Fragen. Jede richtige Antwort bringt Punkte, jede falsche kostet ein Herz.</li>
+      <li>Hinter dem Tor warten die Hüter der Welt. Geh zu ihnen hin, dann stellen sie dir drei Fragen – im großen Finale sogar sechs. Jede richtige Antwort bringt Punkte, jede falsche kostet ein Herz.</li>
       <li>In Welt 3 schaltest du LEDs zu Dualzahlen, in Welt 4 legst du die Eingänge E₁ und E₂ eines Gatters so, dass die LED am Ausgang A richtig leuchtet.</li>
       <li>Am Computer: Antworten mit <kbd>1</kbd>–<kbd>4</kbd>, weiter mit <kbd>Enter</kbd>.</li>
     </ul>
@@ -526,7 +529,7 @@ const B2 = [
 
 // Welt 3: Bits & Bytes (inkl. Schalt-Aufgaben)
 const Q3 = [
-  { type: "bits", n: 4 }, { type: "bits", n: 4 }, { type: "bits", n: 8 },
+  { type: "bits", n: 5 }, { type: "bits", n: 5 }, { type: "bits", n: 4 },
   { q: "Was ist ein Bit?",
     a: ["Die kleinste Informationseinheit: 0 oder 1", "Ein Paket aus 8 Zeichen", "Ein einzelner Buchstabe", "Ein Computerbauteil"],
     e: "Bit kommt von „binary digit“ – Binärziffer." },
@@ -600,6 +603,122 @@ const B4 = [
     e: "Das NICHT-Gatter kehrt den Eingang um." }
 ];
 
+
+// ---------- Zusätzliche Fragen passend zu den Arbeitsblättern ----------
+Q1.push(
+  { q: "Was mussten Sender und Empfänger bei Rauchzeichen vorher unbedingt tun?",
+    a: ["Vereinbaren, was ein bestimmtes Signal bedeutet", "Sich persönlich treffen", "Am gleichen Ort ein Feuer machen", "Eine gemeinsame Schrift lernen"],
+    e: "Ohne gemeinsame Vereinbarung versteht der Empfänger nichts. Das gilt bis heute für jede Art von Kommunikation." },
+  { q: "Womit meldeten Wachtürme in China, dass Feinde kommen?",
+    a: ["Mit Rauchsäulen", "Mit Spiegeln", "Mit Kirchenglocken", "Mit Brieftauben"],
+    e: "Von Turm zu Turm wurde das Rauchsignal weitergegeben – viel schneller als jeder Reiter." },
+  { q: "Wie konnten Trommelsignale verschiedene Nachrichten unterscheiden?",
+    a: ["Schnelles Trommeln bedeutete etwas anderes als langsames", "Durch die Farbe der Trommel", "Durch die Größe der Trommel", "Gar nicht – es gab nur eine Nachricht"],
+    e: "Der Rhythmus war der Code. Auch hier mussten Sender und Empfänger ihn vorher vereinbaren." },
+  { q: "Welches Beispiel aus dem Alltag ist – wie Rauchzeichen – eine vereinbarte Bedeutung von Signalen?",
+    a: ["Die Ampelfarben", "Ein Regenschauer", "Der Sonnenaufgang", "Ein Stein am Wegrand"],
+    e: "Rot heißt „halt“, weil alle das vereinbart haben. Schulglocke, Blinker oder Emojis funktionieren genauso." },
+  { q: "Bis wann wurden Brieftauben noch für geheime Nachrichten eingesetzt?",
+    a: ["Noch im Zweiten Weltkrieg", "Nur in der Antike", "Nur im Mittelalter", "Bis etwa 1500"],
+    e: "Tauben waren lange schneller als jeder Reiter – und noch im 20. Jahrhundert im Einsatz." }
+);
+Q2.push(
+  { q: "Welche Reihenfolge der Erfindungen stimmt?",
+    a: ["Lochkarten-Webstuhl 1804 – Telegraf 1837 – Telefon 1876 – Funk 1895", "Telegraf 1804 – Lochkarten-Webstuhl 1837 – Funk 1876 – Telefon 1895", "Telefon 1837 – Telegraf 1876 – Funk 1804 – Lochkarten-Webstuhl 1895", "Funk 1804 – Telefon 1837 – Lochkarten-Webstuhl 1876 – Telegraf 1895"],
+    e: "1804 Jacquards Webstuhl, 1837 Morses Telegraf, 1876 Bells Telefon, 1895 Marconis Funk." },
+  { q: "Wer ließ ab 1804 Webstühle mit Lochkarten automatisch Muster weben?",
+    a: ["Joseph-Marie Jacquard", "Herman Hollerith", "Samuel Morse", "Konrad Zuse"],
+    e: "Die Lochkarte war die erste Technik, mit der eine Maschine Informationen lesen und verarbeiten konnte." },
+  { q: "Herman Hollerith wertete 1890 die US-Volkszählung mit Lochkarten aus. Was brachte das?",
+    a: ["Zwei statt acht Jahre Arbeit", "Acht statt zwei Jahre Arbeit", "Die Zählung wurde abgeschafft", "Nichts, es war zu teuer"],
+    e: "Holleriths Firma wurde später Teil der IBM – jahrzehntelang der wichtigste Computerhersteller der Welt." },
+  { q: "Wie speichert eine Lochkarte Information?",
+    a: ["Loch = ja, kein Loch = nein", "Durch die Farbe der Karte", "Durch einen Magnetstreifen", "Durch aufgedruckte Buchstaben"],
+    e: "Jede Stelle ist eine Ja/Nein-Entscheidung – genau wie später 1 und 0 im Computer." },
+  { q: "Welches Morsezeichen ist der Buchstabe S?",
+    a: ["· · ·", "− − −", "· −", "− · −"],
+    e: "S = drei kurze Signale, O = drei lange." },
+  { q: "Was konnte das Telefon (1876), was der Telegraf nicht konnte?",
+    a: ["Die eigene Stimme übertragen", "Nachrichten ohne Kabel senden", "Bilder übertragen", "Nachrichten speichern"],
+    e: "Beim Telegrafen musste man Morsezeichen klopfen, beim Telefon konnte man einfach sprechen." },
+  { q: "Wer zeigte 1895, dass Nachrichten auch ohne Kabel übertragen werden können?",
+    a: ["Guglielmo Marconi", "Alexander Graham Bell", "Samuel Morse", "Joseph-Marie Jacquard"],
+    e: "Funk mit elektromagnetischen Wellen ist die Grundlage für Radio, Fernsehen, WLAN und Mobilfunk." }
+);
+B2.push(
+  { q: "Lochkarte: Loch oder kein Loch. Was hat das mit Computern zu tun?",
+    a: ["Es sind genau zwei Zustände – wie 0 und 1", "Computer bestehen aus Papier", "Gar nichts", "Computer können nur Löcher lesen"],
+    e: "„Loch oder kein Loch“, „ja oder nein“, „an oder aus“, „0 oder 1“ – das ist das Prinzip jedes Computers." }
+);
+Q3.push(
+  { q: "Was bedeutet die kleine 2 in 11₂?",
+    a: ["Es ist eine Dualzahl", "Die Zahl wird verdoppelt", "Es ist elf hoch zwei", "Es ist die zweite Zahl"],
+    e: "11₂ ist eine Dualzahl: 1·2 + 1·1 = 3 – also nicht elf!" },
+  { q: "Welchen Wert hat 10101₂?", a: ["21", "17", "25", "10101"],
+    e: "16 + 4 + 1 = 21." },
+  { q: "Wie schreibt man 23 als Dualzahl?", a: ["10111", "11011", "10101", "11101"],
+    e: "23 = 16 + 4 + 2 + 1 → 10111₂." },
+  { q: "Wie schreibt man 30 als Dualzahl?", a: ["11110", "11101", "10110", "11111"],
+    e: "30 = 16 + 8 + 4 + 2 → 11110₂." },
+  { q: "Wie viele verschiedene Zahlen kann man mit 5 Bit darstellen?", a: ["32", "31", "25", "10"],
+    e: "2⁵ = 32 Zahlen, nämlich 0 bis 31." },
+  { q: "Zaubertrick: Deine gedachte Zahl steht auf den Karten mit den Werten 1, 4 und 16. Welche Zahl ist es?", a: ["21", "20", "13", "64"],
+    e: "Kartenwerte addieren: 1 + 4 + 16 = 21. Ja bedeutet 1, Nein bedeutet 0 – das ergibt 10101₂." },
+  { q: "Zaubertrick: Auf welchen Karten steht die Zahl 13?", a: ["Auf den Karten 8, 4 und 1", "Auf den Karten 8 und 5", "Auf den Karten 16 und 1", "Auf allen fünf Karten"],
+    e: "13 = 8 + 4 + 1 = 01101₂. Jede Karte ist ein Stellenwert." },
+  { q: "Warum funktioniert der Zahlkarten-Zaubertrick?", a: ["Jede Karte steht für einen Stellenwert – Ja = 1, Nein = 0", "Die Karten sind heimlich markiert", "Man kann Gedanken lesen", "Weil es nur fünf Zahlen gibt"],
+    e: "Die Karten zeigen die Stellenwerte 1, 2, 4, 8 und 16. Wer sie addiert, rechnet eine Dualzahl um." },
+  { q: "Geheimbotschaft (A = 1, B = 2 … Z = 26): Welcher Buchstabe ist 01111₂?", a: ["O", "M", "P", "N"],
+    e: "01111₂ = 8 + 4 + 2 + 1 = 15. Der 15. Buchstabe ist O." },
+  { q: "Geheimbotschaft (A = 1 … Z = 26): Welches Wort ist 00010 · 00001 · 01100 · 01100?", a: ["BALL", "BELL", "BALD", "CALL"],
+    e: "2 = B, 1 = A, 12 = L, 12 = L." },
+  { q: "Mit A = 1 … Z = 26: Wie lautet der Buchstabe I als 5-Bit-Dualzahl?", a: ["01001", "01010", "10010", "01000"],
+    e: "I ist der 9. Buchstabe: 9 = 8 + 1 → 01001₂." }
+);
+B3.push(
+  { q: "Geheimbotschaft (A = 1 … Z = 26): Welches Wort ist 01001 · 01110 · 00110 · 01111?", a: ["INFO", "INKA", "IGEL", "ENDE"],
+    e: "9 = I, 14 = N, 6 = F, 15 = O." },
+  { q: "Welche ist die größte Zahl, die man mit 5 Bit schreiben kann?", a: ["31", "32", "16", "63"],
+    e: "11111₂ = 16 + 8 + 4 + 2 + 1 = 31." },
+  { type: "bits", n: 5 }
+);
+Q4.push(
+  { type: "gate", gate: "NAND", want: 0 }, { type: "gate", gate: "NOR", want: 1 },
+  { q: "Was ist ein Öffner?", a: ["Ein Schalter, der in Ruhe geschlossen ist und beim Drücken den Strom unterbricht", "Ein Schalter, der in Ruhe offen ist und beim Drücken schließt", "Ein Bauteil, das Strom speichert", "Eine besonders helle LED"],
+    e: "Beim Schließer ist es umgekehrt: in Ruhe offen, beim Drücken geschlossen." },
+  { q: "Eine LED und ein Öffner in Reihe. Welche Grundfunktion ist das?", a: ["NICHT", "UND", "ODER", "NAND"],
+    e: "In Ruhe (E₁ = 0) leuchtet die LED, gedrückt (E₁ = 1) geht sie aus. Der Eingang wird umgekehrt." },
+  { q: "Zwei Öffner parallel vor einer LED. Welche Grundfunktion ist das?", a: ["NAND", "NOR", "UND", "ODER"],
+    e: "Die LED geht nur aus, wenn beide Öffner gedrückt sind (1 und 1). Das ist das umgedrehte UND." },
+  { q: "Zwei Öffner in Reihe vor einer LED. Welche Grundfunktion ist das?", a: ["NOR", "NAND", "UND", "ODER"],
+    e: "Die LED leuchtet nur, wenn keiner gedrückt ist (0 und 0). Das ist das umgedrehte ODER." },
+  { q: "Alltag: Die Waschmaschine startet erst, wenn die Tür zu ist und der Startknopf gedrückt wird.", a: ["UND", "ODER", "NICHT", "NOR"],
+    e: "Beide Bedingungen müssen erfüllt sein." },
+  { q: "Alltag: Das Innenlicht im Auto leuchtet, sobald die Fahrertür oder die Beifahrertür geöffnet ist.", a: ["ODER", "UND", "NICHT", "NAND"],
+    e: "Eine offene Tür reicht schon." },
+  { q: "Alltag: Wird der Notschalter gedrückt, fällt der Strom für alle Maschinen aus.", a: ["NICHT", "UND", "ODER", "NOR"],
+    e: "Gedrückt (1) bedeutet Strom aus (0) – ein Notschalter ist technisch ein Öffner." },
+  { q: "Alltag: Die Alarmanlage schlägt an, wenn die Tür oder das Fenster geöffnet wird.", a: ["ODER", "UND", "NICHT", "NAND"],
+    e: "Schon eine der beiden Bedingungen löst den Alarm aus." }
+);
+B4.push(
+  { type: "gate", gate: "NAND", want: 1 }, { type: "gate", gate: "NOR", want: 0 },
+  { q: "NAND-Gatter: Bei welcher Eingabe ist A = 0?", a: ["Nur bei E₁ = 1 und E₂ = 1", "Nur bei E₁ = 0 und E₂ = 0", "Immer", "Nie"],
+    e: "Merkregel: NAND gibt nur bei 1 und 1 eine 0, sonst immer 1." },
+  { q: "NOR-Gatter: Bei welcher Eingabe ist A = 1?", a: ["Nur bei E₁ = 0 und E₂ = 0", "Nur bei E₁ = 1 und E₂ = 1", "Sobald ein Eingang 1 ist", "Nie"],
+    e: "Merkregel: NOR gibt nur bei 0 und 0 eine 1, sonst immer 0." },
+  { q: "Warum baut die Elektronik fast alles aus NAND-Gattern?", a: ["Mit NAND lassen sich alle anderen Grundfunktionen aufbauen", "NAND-Gatter leuchten heller", "NAND braucht keinen Strom", "Andere Gatter gibt es nicht zu kaufen"],
+    e: "NAND ist ein „Universalgatter“: Aus NAND-Gattern kann man NICHT, UND, ODER und alle anderen bauen." },
+  { q: "Wie wird aus einem NAND-Gatter ein NICHT-Gatter?", a: ["Man verbindet die Eingänge E₁ und E₂ miteinander", "Man dreht die LED um", "Man schließt eine zweite LED an", "Man polt die Batterie um"],
+    e: "Dann gibt es nur noch die Zeilen 00 → 1 und 11 → 0. Das ist genau NICHT." },
+  { q: "Beim Schließer gilt: Reihe = UND, parallel = ODER. Was gilt beim Öffner?", a: ["Reihe = NOR, parallel = NAND", "Reihe = UND, parallel = ODER", "Reihe = NAND, parallel = NOR", "Reihe = ODER, parallel = UND"],
+    e: "Beim Öffner ist alles „umgedreht“ – das ist die Spiegellogik." },
+  { q: "Leuchtet die LED A?", diagram: { gate: "NAND", e1: 1, e2: 1 }, a: ["Nein, A = 0", "Ja, A = 1"],
+    e: "NAND gibt nur bei E₁ = 1 und E₂ = 1 eine 0." },
+  { q: "Leuchtet die LED A?", diagram: { gate: "NOR", e1: 0, e2: 0 }, a: ["Ja, A = 1", "Nein, A = 0"],
+    e: "NOR gibt nur bei E₁ = 0 und E₂ = 0 eine 1." }
+);
+
 // ======================================================================
 //  SPRITES
 // ======================================================================
@@ -660,9 +779,9 @@ const VICE = sprite([
 const HEAD = sprite([
   ".....yyyyy......", "....yyyyyyy.....", "...yyyyyyyyy....", "...ykkkskkky....", "...ykekskeky....", "...yscssscsy....",
   "...ysssssssy....", "....ysmmmsy.....", "......ssss..yY..", "...rrrrwwrrrYy..", "..rrrrrwwrrrryY.", "..rRrrrwwrrrRYy.",
-  "..rRrrrwwrrrRyY.", "..rRrrrrrrrrRYy.", "..sRrrrrrrrrRsb.", "...rrrrrrrrrr...", "...nnnnnnnnnn...", "...nnnnnnnnnn...",
-  "...nNnnnnnnNn...", "...nnnnnnnnnn...", ".....dd..dd.....", ".....dd..dd.....", "....ooo..ooo....", "................"
-], { y: "#ecd06e", Y: "#c9a440", s: "#f2c8a2", k: "#1c1c24", e: "#3f6fd0", c: "#eba293", m: "#b4545a", r: "#c45168", R: "#9c3b52", w: "#fbf7f2", n: "#2b3358", N: "#3a4470", d: "#d9b294", o: "#1a1a22", b: "#3b7bd6" });
+  "..rRrrrwwrrrRyY.", "..rRrrrrrrrrRYy.", "..sRrrrrrrrrRsb.", "...rrrrrrrrrr...", "...gggggggggg...", "...nnnnnnnnnn...",
+  "...nnnn..nnnn...", "...nnnn..nnnn...", "...nnnN..Nnnn...", "...nnnN..Nnnn...", "...oooo..oooo...", "................"
+], { y: "#ecd06e", Y: "#c9a440", s: "#f2c8a2", k: "#1c1c24", e: "#6b3f1f", c: "#eba293", m: "#b4545a", r: "#1f3f8f", R: "#16306e", w: "#fbf7f2", n: "#172a5c", N: "#24397a", g: "#c9a54a", d: "#d9b294", o: "#1a1a22", b: "#c9a54a" });
 
 const BOSS_IMG = { pater: PATER, vice: VICE, head: HEAD };
 const BOSS_OUT = {}; Object.keys(BOSS_IMG).forEach(k => BOSS_OUT[k] = outline(BOSS_IMG[k], "#e3e9f6"));
@@ -710,9 +829,9 @@ const WORLDS = [
   { n: 4, name: "Gatter-Labyrinth", era: "Logische Grundfunktionen", theme: "gatter", enemy: "glitch", enemyName: "Glitches",
     station: "Schaltplan", stationPl: "Pläne", qs: Q4, bq: B4,
     intro: "Im Inneren des Computers entscheiden winzige Schalter: UND, ODER, NICHT. Auf den Schaltplänen legst du die Eingänge E₁ und E₂ so, dass die LED am Ausgang A richtig leuchtet. Die Glitches hüpfen – pass auf!",
-    bossLine: "Löse alle vier Schaltpläne. Am Ende stellt dir die Prüfungskommission die letzten drei Fragen.",
-    boss: { members: ["pater", "head", "vice"], title: "DIE PRÜFUNGSKOMMISSION", who: ["Der Pater", "Die Schulleiterin", "Der stellvertretende Schulleiter"],
-      hello: "Die Prüfungskommission ist vollzählig! Jeder von uns stellt dir eine letzte Frage zu den logischen Grundfunktionen. Bestehst du, kommt deine Nachricht endlich ans Ziel.",
+    bossLine: "Löse alle vier Schaltpläne. Im großen Finale stellt dir die Prüfungskommission sechs Fragen: drei Wiederholungsfragen aus allen Welten und drei zur Logik.",
+    boss: { final: true, members: ["pater", "head", "vice"], title: "DIE PRÜFUNGSKOMMISSION · ALLE DREI HÜTER", who: ["Der Pater", "Die Schulleiterin", "Der stellvertretende Schulleiter"],
+      hello: "Die Prüfungskommission ist vollzählig! Jeder von uns stellt dir zwei Fragen: In der ersten Runde wiederholen wir alle Welten, in der zweiten geht es um die Logik. Bestehst du, kommt deine Nachricht endlich ans Ziel.",
       bye: "Herzlichen Glückwunsch! Vom Rauchzeichen bis zum Logikgatter – deine Nachricht ist angekommen. Die Kommission ist sehr zufrieden mit dir." },
     grounds: [[0, 12], [15, 24], [28, 35], [39, 48], [52, 60], [64, 71], [74, 112]],
     plats: [[5, 10, 3], [13, 10, 2], [19, 8, 3], [25, 10, 3], [31, 8, 2], [36, 10, 3], [43, 9, 3], [49, 10, 3], [55, 8, 3], [61, 10, 3], [67, 8, 2], [72, 10, 2], [76, 8, 2], [91, 10, 2], [99, 9, 2]],
@@ -959,10 +1078,14 @@ function update(dt) {
   G.w.time += dt;
   const p = G.player, h = G.hero;
   let dir;
-  if (ctrl === "tap") {
-    if (G.bossActive) { dir = 0; p.wait = false; if (G.boss) p.face = (G.boss.x + G.boss.w / 2 > p.x + p.w / 2) ? 1 : -1; }
-    else if (p.wait) { dir = 0; if (keys.jumpPressed) { p.wait = false; keys.jumpPressed = false; } }
-    else dir = p.face;
+  const bst = G.bossActive && G.boss ? G.boss.state : null;
+  if (bst && bst !== "call") {
+    // Auftritt und Fragerunde: Held bleibt stehen und schaut zum Endgegner
+    dir = 0; p.wait = false; keys.jumpPressed = false;
+    p.face = (G.boss.members[0].x + 28 > p.x + p.w / 2) ? 1 : -1;
+  } else if (ctrl === "tap") {
+    if (p.wait) { dir = 0; if (keys.jumpPressed) { p.wait = false; keys.jumpPressed = false; } }
+    else dir = bst ? 1 : p.face;
   } else { dir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0); p.wait = false; }
   const max = RUN * h.speed * (ctrl === "tap" ? .84 : 1);
   p.atk = Math.max(0, p.atk - dt); p.atkCd = Math.max(0, p.atkCd - dt); G.shake = Math.max(0, G.shake - dt);
@@ -1075,48 +1198,86 @@ function openGate() {
 // ======================================================================
 //  ENDGEGNER: drei Fragen
 // ======================================================================
-const BOSS_HOME = 104 * T;
+const BOSS_HOME = 104 * T, GROUND_B = 13 * T - 96;
+const BOSS_SHOUT = { pater: "Halt! Wer betritt meine Bibliothek?", vice: "Moment mal! Hier geht's nur mit Prüfung weiter!", head: "Ah – Besuch in meinem Reich der Bits!" };
+const BOSS_CALL = {
+  pater: ["Komm ruhig näher, junger Bote!", "Nur keine Scheu – komm her!"],
+  vice: ["Na komm, trau dich ran!", "Hierher, ich beiß nicht!"],
+  head: ["Komm doch mal zu mir!", "Na, wird's bald? Komm her!"]
+};
+const pick = a => a[Math.random() * a.length | 0];
 function startBoss() {
   const w = G.world;
   G.bossActive = true; G.gateOpen = false; G.gateTarget = 1;
   for (let y = 3; y <= 12; y++) G.grid[y][87] = 9;
-  G.checkpoint = { x: 91 * T, y: 13 * T - 44 };
-  const p = G.player;
-  if (ctrl === "tap") { p.x = Math.max(p.x, 91 * T); p.vx = 0; }
+  G.checkpoint = { x: 89 * T, y: 13 * T - 44 };
+  G.shake = .35; sfx("gate");
   const n = w.boss.members.length;
-  const mem = w.boss.members.map((k, i) => ({ k, x: (n === 1 ? BOSS_HOME : 97 * T + i * 4.2 * T), bob: i * 1.3, flash: 0, say: "", sayT: 0 }));
-  const x0 = mem[0].x, x1 = mem[n - 1].x + 56;
-  G.boss = { members: mem, x: x0, y: 13 * T - 96, w: x1 - x0, h: 96, hp: 3, maxHp: 3, state: "idle", active: n > 1 ? 1 : 0 };
-  bossQuiz();
+  const mem = w.boss.members.map((k, i) => ({
+    k, tx: n === 1 ? BOSS_HOME : 99 * T + i * 4 * T, x: 114 * T + i * 2.6 * T, y: GROUND_B, vy: 0,
+    bob: i * 1.3, flash: 0, say: "", sayT: 0, arrived: false, walking: false, delay: .5 + i * .6
+  }));
+  const total = w.boss.final ? 6 : 3;
+  G.boss = { members: mem, x: mem[0].tx, y: GROUND_B, w: mem[n - 1].tx + 56 - mem[0].tx, h: 96, hp: total, maxHp: total,
+    state: "enter", t: 0, active: 0, callT: 0, caller: n > 1 ? 1 : 0 };
+  G.cine = 0; G.toasts = [];
+  bossFanfare();
 }
 async function bossQuiz() {
   const w = G.world, b = G.boss;
-  await talk(w.boss.who[b.active], w.boss.hello, "Ich bin bereit", w.boss.members[b.active]);
-  // mindestens eine Mitmach-Aufgabe, falls vorhanden
-  const inter = shuffle(w.bq.filter(q => q.type)), mc = shuffle(w.bq.filter(q => !q.type));
-  const qs = shuffle((inter.length ? [inter[0]] : []).concat(mc).slice(0, 3));
-  for (let i = 0; i < 3; i++) {
+  const lead = b.members.length > 1 ? 1 : 0;
+  b.state = "talk";
+  await talk(w.boss.who[lead], w.boss.hello, "Ich bin bereit", w.boss.members[lead]);
+  let qs, askers;
+  if (w.boss.final) {
+    // Runde 1: Wiederholung aus allen Welten, Runde 2: Logik
+    const pool = { pater: B1, head: B3, vice: B2 };
+    const logic = shuffle(B4.filter(q => q.type)).slice(0, 1).concat(shuffle(B4.filter(q => !q.type)).slice(0, 2));
+    qs = b.members.map(m => pick(pool[m.k])).concat(shuffle(logic));
+    askers = [0, 1, 2, 0, 1, 2];
+  } else {
+    const inter = shuffle(w.bq.filter(q => q.type)), mc = shuffle(w.bq.filter(q => !q.type));
+    qs = shuffle((inter.length ? [inter[0]] : []).concat(mc).slice(0, 3));
+    askers = [0, 0, 0];
+  }
+  const praise = ["Sehr gut!", "Richtig, weiter so!", "Ausgezeichnet!", "Stark!", "Genau so!", "Hervorragend!"];
+  for (let i = 0; i < qs.length; i++) {
     if (!G || G.over) return;
-    b.active = b.members.length > 1 ? i : 0;
+    if (w.boss.final && i === 3) { say(b.members[1], "Zweite Runde: jetzt wird's logisch!", 1.8); await new Promise(r => setTimeout(r, 1500)); if (!G || G.over) return; }
+    b.active = askers[i];
     const m = b.members[b.active];
     b.state = "ask";
-    const asker = w.boss.who[b.active];
-    const ok = await ask(qs[i], `${asker} · Frage ${i + 1} von 3`);
+    const ok = await ask(qs[i], `${w.boss.who[b.active]} · Frage ${i + 1} von ${qs.length}`);
     if (!G || G.over) return;
     b.hp--;
-    if (ok) { G.w.correct++; G.score += 150; G.w.ansPts += 150; m.flash = .5; say(m, ["Sehr gut!", "Richtig, weiter so!", "Ausgezeichnet!"][i], 1.4); }
+    if (ok) { G.w.correct++; G.score += 150; G.w.ansPts += 150; m.flash = .5; m.vy = -260; say(m, praise[i % praise.length], 1.4); }
     else { say(m, "Hmm … das solltest du nachlesen.", 1.6); loseHeartQuiet(); if (G.over) return; }
     b.state = "idle";
     await new Promise(r => setTimeout(r, 1300));
   }
   if (!G || G.over || G.won) return;
-  G.won = true; sfx("win");
-  b.members.forEach(m => say(m, "Bestanden!", 2));
+  G.won = true; b.state = "done"; b.t = 0; sfx("win");
+  b.members.forEach(m => say(m, "Bestanden!", 2.4));
   setTimeout(async () => {
     if (!G) return;
-    await talk(w.boss.who[b.members.length > 1 ? 1 : 0], w.boss.bye, "Zur Auswertung", w.boss.members[b.members.length > 1 ? 1 : 0]);
+    await talk(w.boss.who[lead], w.boss.bye, "Zur Auswertung", w.boss.members[lead]);
     worldWon();
-  }, 1100);
+  }, 2200);
+}
+function tone(f, at, dur, type, vol) {
+  try {
+    if (muted) return;
+    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    if (AC.state === "suspended") AC.resume();
+    const o = AC.createOscillator(), g = AC.createGain(), n = AC.currentTime + at;
+    o.type = type || "square"; o.frequency.setValueAtTime(f, n);
+    g.gain.setValueAtTime(vol || .045, n); g.gain.exponentialRampToValueAtTime(.0001, n + dur);
+    o.connect(g); g.connect(AC.destination); o.start(n); o.stop(n + dur + .03);
+  } catch (e) {}
+}
+function bossFanfare() {
+  [[196, 0, .18], [196, .2, .18], [196, .4, .18], [262, .62, .5], [233, 1.15, .2], [262, 1.38, .7]].forEach(([f, a, d]) => tone(f, a, d, "square"));
+  [[98, .62, .9], [131, 1.38, .9]].forEach(([f, a, d]) => tone(f, a, d, "triangle", .07));
 }
 function say(m, text, t) { m.say = text; m.sayT = t || 1.6; }
 function talk(who, text, btn, key) {
@@ -1132,19 +1293,52 @@ function talk(who, text, btn, key) {
 }
 function updateBoss(dt) {
   const b = G.boss, p = G.player;
-  b.members.forEach(m => { m.bob += dt; m.flash = Math.max(0, m.flash - dt); m.sayT -= dt; if (m.sayT <= 0) m.say = ""; });
-  if (overlap(p, b)) { const s = (p.x + p.w / 2 < b.x + b.w / 2) ? -1 : 1; p.vx = s * 260; if (p.vy > 0 && p.y + p.h < b.y + 20) p.vy = -400; }
+  b.t += dt;
+  G.cine = clamp((G.cine || 0) + (b.state === "enter" ? dt * 2.2 : -dt * 2), 0, 1);
+  b.members.forEach(m => {
+    m.bob += dt; m.flash = Math.max(0, m.flash - dt); m.sayT -= dt; if (m.sayT <= 0) m.say = "";
+    if (m.y < GROUND_B || m.vy) { m.vy += GRAV * dt; m.y += m.vy * dt; if (m.y >= GROUND_B) { m.y = GROUND_B; m.vy = 0; } }
+  });
+  if (b.state === "enter") {
+    b.members.forEach((m, i) => {
+      if (b.t < m.delay || m.arrived) return;
+      m.walking = true;
+      m.x -= 210 * dt;
+      if (Math.random() < dt * 16) G.parts.push({ x: m.x + 30 + Math.random() * 20, y: 13 * T - 4, vx: 30 + Math.random() * 40, vy: -20 - Math.random() * 30, life: .5, max: .5, r: 3, color: "#c9d3ea", g: 0 });
+      if (m.x <= m.tx) {
+        m.x = m.tx; m.arrived = true; m.walking = false; m.flash = .7; m.vy = -420; G.shake = .3; sfx("stomp");
+        for (let k = 0; k < 16; k++) G.parts.push({ x: m.x + 28, y: 13 * T - 6, vx: (Math.random() - .5) * 340, vy: -Math.random() * 160, life: .6, max: .6, r: 3, color: "#e9edf6", g: 400 });
+        if (b.members.length === 1 || i === 1) say(m, b.members.length === 1 ? BOSS_SHOUT[m.k] : "Die Prüfungskommission tagt!", 2.4);
+      }
+    });
+    if (b.members.every(m => m.arrived) && b.t > b.members[b.members.length - 1].delay + 3.4) {
+      b.state = "call"; b.t = 0; b.callT = 0;
+      if (ctrl === "tap") p.wait = true;
+    }
+  } else if (b.state === "call") {
+    b.callT -= dt;
+    if (b.callT <= 0) { const m = b.members[b.caller]; say(m, b.members.length > 1 ? "Tritt vor die Kommission!" : pick(BOSS_CALL[m.k]), 2.2); b.callT = 3.2; b.caller = b.members.length > 1 ? (b.caller + 1) % b.members.length : 0; }
+    const stop = Math.min(...b.members.map(m => m.x)) - 3 * T;
+    if (p.x + p.w >= stop && p.onGround) { b.state = "greet"; p.vx = 0; b.members.forEach(m => m.say = ""); bossQuiz(); }
+  } else if (b.state === "done") {
+    b.members.forEach(m => { if (m.y >= GROUND_B && Math.random() < dt * 2.5) m.vy = -320; });
+    if (Math.random() < dt * 40) {
+      const cols = ["#ff5a4a", "#ffe066", "#6cf0ff", "#7dff9a", "#ffffff", "#ff9ad8"];
+      G.parts.push({ x: G.cam + Math.random() * W, y: 40, vx: (Math.random() - .5) * 60, vy: 40 + Math.random() * 80, life: 3, max: 3, r: 3, color: pick(cols), g: 60 });
+    }
+  }
+  if (b.state !== "enter" && overlap(p, b)) { const s = (p.x + p.w / 2 < b.x + b.w / 2) ? -1 : 1; p.vx = s * 260; if (p.vy > 0 && p.y + p.h < b.y + 20) p.vy = -400; }
 }
 
 // ======================================================================
 //  AUFGABEN-DIALOG (Auswahl, Dualzahl schalten, Gatter)
 // ======================================================================
 let qState = null;
-const GATE_FN = { UND: (a, b) => a & b, ODER: (a, b) => a | b, NICHT: a => a ? 0 : 1 };
-const GATE_SYM = { UND: "&", ODER: "≥1", NICHT: "1" };
+const GATE_FN = { UND: (a, b) => a & b, ODER: (a, b) => a | b, NICHT: a => a ? 0 : 1, NAND: (a, b) => (a & b) ? 0 : 1, NOR: (a, b) => (a | b) ? 0 : 1 };
+const GATE_SYM = { UND: "&", ODER: "≥1", NICHT: "1", NAND: "&", NOR: "≥1" };
 
 function gateSVG(gate, e1, e2, aState, interactive) {
-  const one = gate === "NICHT";
+  const one = gate === "NICHT", neg = one || gate === "NAND" || gate === "NOR";
   const ys = one ? [75] : [45, 105];
   const vals = one ? [e1] : [e1, e2];
   const navy = "#14285e";
@@ -1159,8 +1353,8 @@ function gateSVG(gate, e1, e2, aState, interactive) {
   s += `<rect x="140" y="22" width="80" height="106" fill="#ffffff" stroke="${navy}" stroke-width="3"/>`;
   s += `<text x="180" y="62" text-anchor="middle" font-family="Pixelify Sans, monospace" font-size="26" font-weight="700" fill="${navy}">${GATE_SYM[gate]}</text>`;
   s += `<text x="180" y="116" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-size="12" fill="#4d5a7a">${gate}</text>`;
-  const ox = one ? 232 : 220;
-  if (one) s += `<circle cx="226" cy="75" r="6" fill="#ffffff" stroke="${navy}" stroke-width="3"/>`;
+  const ox = neg ? 232 : 220;
+  if (neg) s += `<circle cx="226" cy="75" r="6" fill="#ffffff" stroke="${navy}" stroke-width="3"/>`;
   const lit = aState === 1;
   s += `<line x1="${ox}" y1="75" x2="292" y2="75" stroke="${lit ? "#d4483c" : navy}" stroke-width="3"/>`;
   // LED mit Pfeilen
@@ -1298,7 +1492,7 @@ function checkInteractive() {
     const A = GATE_FN[q.gate](a, b);
     const ok = A === q.want; qState.ok = ok;
     qState.draw();
-    const rule = { UND: "UND: A = 1 nur, wenn E₁ = 1 und E₂ = 1.", ODER: "ODER: A = 1, sobald mindestens ein Eingang 1 ist. A = 0 nur bei E₁ = 0 und E₂ = 0.", NICHT: "NICHT: A ist immer das Gegenteil von E₁." }[q.gate];
+    const rule = { UND: "UND: A = 1 nur, wenn E₁ = 1 und E₂ = 1.", ODER: "ODER: A = 1, sobald mindestens ein Eingang 1 ist. A = 0 nur bei E₁ = 0 und E₂ = 0.", NICHT: "NICHT: A ist immer das Gegenteil von E₁.", NAND: "NAND: A = 0 nur bei E₁ = 1 und E₂ = 1, sonst immer 1.", NOR: "NOR: A = 1 nur bei E₁ = 0 und E₂ = 0, sonst immer 0." }[q.gate];
     const now = q.gate === "NICHT" ? `Bei E₁ = ${a} ist A = ${A}.` : `Bei E₁ = ${a} und E₂ = ${b} ist A = ${A}.`;
     feedback(ok, `${now} ${rule}`);
   }
@@ -1776,27 +1970,97 @@ function drawPlayer() {
   }
 }
 
+function drawAura(m, t, b) {
+  const cx = m.x + 28, cy = m.y + 48;
+  const strong = b.state === "enter" || b.state === "call" || b.state === "done" ? 1 : .35;
+  ctx.save();
+  if (m.k === "pater") { // goldene Strahlen
+    ctx.translate(cx, cy);
+    for (let k = 0; k < 12; k++) {
+      ctx.rotate(Math.PI / 6);
+      ctx.fillStyle = `rgba(255,214,120,${.13 * strong})`;
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-10, -110 - Math.sin(t * 3 + k) * 12); ctx.lineTo(10, -110 - Math.sin(t * 3 + k) * 12); ctx.fill();
+    }
+  } else if (m.k === "vice") { // knisternde Funken
+    ctx.strokeStyle = `rgba(255,230,110,${.85 * strong})`; ctx.lineWidth = 2;
+    for (let k = 0; k < 3; k++) {
+      const a0 = Math.random() * Math.PI * 2, r0 = 40, r1 = 70;
+      ctx.beginPath(); ctx.moveTo(cx + Math.cos(a0) * r0, cy + Math.sin(a0) * r0);
+      for (let j = 1; j <= 4; j++) { const r = r0 + (r1 - r0) * j / 4, a = a0 + (Math.random() - .5) * .5; ctx.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); }
+      ctx.stroke();
+    }
+  } else { // Regen aus Nullen und Einsen
+    ctx.font = "700 14px 'Pixelify Sans', monospace"; ctx.textAlign = "center";
+    for (let k = 0; k < 14; k++) {
+      const x = cx - 60 + (k * 37) % 120, y = cy - 120 + ((t * 70 + k * 53) % 170);
+      ctx.fillStyle = `rgba(120,220,255,${(.25 + (k % 3) * .15) * strong})`; ctx.fillText((k + Math.floor(t * 3)) % 2 ? "1" : "0", x, y);
+    }
+  }
+  ctx.restore();
+}
 function drawBoss(t) {
   const b = G.boss; if (!b) return;
+  b.members.forEach(m => { if (m.x < G.cam + W + 80) drawAura(m, t, b); });
   b.members.forEach((m, i) => {
-    const bob = Math.sin(m.bob * 3) * 1.5, by = 13 * T - 96;
-    ctx.fillStyle = "rgba(8,18,46,.3)"; ctx.beginPath(); ctx.ellipse(m.x + 30, 13 * T - 2, 34, 6, 0, 0, 7); ctx.fill();
-    ctx.drawImage(BOSS_OUT[m.k], Math.round(m.x - 8), Math.round(by + bob - 4), 72, 104);
-    if (m.flash > 0) { ctx.globalAlpha = Math.min(.6, m.flash); ctx.fillStyle = "#fff6c8"; ctx.beginPath(); ctx.arc(m.x + 28, by + 40, 60, 0, 7); ctx.fill(); ctx.globalAlpha = 1; }
+    const air = GROUND_B - m.y;
+    const bob = m.walking ? -Math.abs(Math.sin(m.bob * 10)) * 6 : Math.sin(m.bob * 3) * 1.5;
+    ctx.fillStyle = `rgba(8,18,46,${.32 - Math.min(.2, air / 400)})`; ctx.beginPath(); ctx.ellipse(m.x + 30, 13 * T - 2, 34 - Math.min(14, air / 8), 6, 0, 0, 7); ctx.fill();
+    ctx.save();
+    ctx.translate(m.x + 28, m.y + 100);
+    if (m.walking) ctx.rotate(Math.sin(m.bob * 10) * .07);
+    ctx.drawImage(BOSS_OUT[m.k], -36, -104 + bob, 72, 104);
+    ctx.restore();
+    if (m.flash > 0) { ctx.globalAlpha = Math.min(.6, m.flash); ctx.fillStyle = "#fff6c8"; ctx.beginPath(); ctx.arc(m.x + 28, m.y + 40, 60, 0, 7); ctx.fill(); ctx.globalAlpha = 1; }
+    if (b.state === "call") { // winkende Hand: „Komm her!“
+      const hx = m.x - 2, hy = m.y + 52 + Math.sin(t * 9 + i) * 6;
+      ctx.fillStyle = "#0b1838"; ctx.fillRect(hx - 6, hy - 6, 12, 12);
+      ctx.fillStyle = "#f2c8a2"; ctx.fillRect(hx - 4, hy - 4, 8, 8); ctx.fillRect(hx - 8, hy - 2 + Math.sin(t * 9 + i) * 2, 4, 3);
+      ctx.strokeStyle = "rgba(255,255,255,.7)"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(hx, hy, 14, Math.PI * .8, Math.PI * 1.2); ctx.stroke();
+    }
     const asking = b.state === "ask" && b.active === i;
     if (asking) {
-      const ox = m.x + 28, oy = by - 30 + Math.sin(t * 4) * 3;
-      if (m.k === "pater") { // aufgeschlagenes Buch
+      const ox = m.x + 28, oy = m.y - 30 + Math.sin(t * 4) * 3;
+      if (m.k === "pater") {
         ctx.fillStyle = "#7a2e2e"; ctx.fillRect(ox - 24, oy - 2, 48, 22);
         ctx.fillStyle = "#f7f3ea"; ctx.fillRect(ox - 21, oy, 20, 18); ctx.fillRect(ox + 1, oy, 20, 18);
         ctx.fillStyle = "#8a7a66"; for (let k = 0; k < 4; k++) { ctx.fillRect(ox - 18, oy + 3 + k * 4, 14, 1.5); ctx.fillRect(ox + 4, oy + 3 + k * 4, 14, 1.5); }
-      } else { // Fragezeichen-Tafel
+      } else {
         ctx.fillStyle = C.navy; ctx.fillRect(ox - 20, oy - 4, 40, 26); ctx.strokeStyle = "#e9edf6"; ctx.lineWidth = 2; ctx.strokeRect(ox - 20, oy - 4, 40, 26);
         ctx.fillStyle = "#fff"; ctx.font = "700 18px 'Pixelify Sans', monospace"; ctx.textAlign = "center"; ctx.fillText(m.k === "head" ? "01?" : "·−?", ox, oy + 15);
       }
     }
-    if (m.say) bubble(m.x + 28, by - (asking ? 46 : 14), m.say);
+    if (m.say) bubble(m.x + 28, m.y - (asking ? 46 : 14), m.say);
   });
+}
+// Kino-Balken, Spotlight und Namensbanner beim Auftritt
+function drawCinema(t) {
+  const b = G.boss; if (!b || !G.cine) return;
+  const k = G.cine, ease = k * k * (3 - 2 * k);
+  // Spotlight
+  if (b.state === "enter") {
+    const m = b.members[b.members.length > 1 ? 1 : 0];
+    const sx = m.x + 28 - Math.round(G.cam), sy = 13 * T - 60;
+    const g = ctx.createRadialGradient(sx, sy, 60, sx, sy, 420);
+    g.addColorStop(0, "rgba(4,8,24,0)"); g.addColorStop(1, `rgba(4,8,24,${.55 * ease})`);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  }
+  const bh = 64 * ease;
+  ctx.fillStyle = "#03060f"; ctx.fillRect(0, 0, W, bh); ctx.fillRect(0, H - bh, W, bh);
+  // Banner
+  if (b.state === "enter" && b.t > .3) {
+    const parts = G.world.boss.title.split(" · ");
+    const s = clamp((b.t - .3) / .45, 0, 1), e = 1 - Math.pow(1 - s, 3);
+    const x = -W + e * W, y = 92;
+    ctx.save(); ctx.translate(x, 0);
+    ctx.fillStyle = "rgba(6,13,36,.92)"; ctx.fillRect(0, y, W, 74);
+    ctx.fillStyle = "#e9edf6"; ctx.fillRect(0, y, W, 3); ctx.fillRect(0, y + 71, W, 3);
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#ff5a4a"; ctx.font = "700 15px 'Pixelify Sans', monospace"; ctx.fillText(G.world.boss.final ? "GROSSES FINALE" : "ENDGEGNER", 60, y + 24);
+    ctx.fillStyle = "#ffffff"; ctx.font = "700 34px 'Pixelify Sans', monospace"; ctx.fillText(parts[0], 60, y + 58);
+    if (parts[1]) { ctx.fillStyle = "#9fb2dd"; ctx.font = "600 18px 'Pixelify Sans', monospace"; ctx.textAlign = "right"; ctx.fillText(parts[1], W - 60, y + 56); }
+    ctx.restore();
+  }
 }
 function bubble(x, y, text) {
   ctx.font = "700 15px 'Atkinson Hyperlegible', sans-serif";
@@ -1845,15 +2109,15 @@ function drawHUD() {
   const m = Math.floor(G.w.time / 60), s = String(Math.floor(G.w.time % 60)).padStart(2, "0");
   ctx.fillText(`${m}:${s}`, x + 330, 30);
   ctx.textAlign = "right"; ctx.fillText(`${G.score} Punkte`, W - 132, 30);
-  if (G.bossActive && G.boss) {
+  if (G.bossActive && G.boss && G.boss.state !== "enter") {
     const b = G.boss, bw = 380, bx = W / 2 - bw / 2, by = 60;
     ctx.fillStyle = "rgba(6,13,36,.85)"; ctx.fillRect(bx - 8, by - 4, bw + 16, 48); ctx.fillStyle = "#e9edf6"; ctx.fillRect(bx - 8, by + 42, bw + 16, 2);
     ctx.fillStyle = "#eef1f8"; ctx.textAlign = "center"; ctx.font = "600 15px 'Pixelify Sans', monospace";
     ctx.fillText(G.world.boss.title, W / 2, by + 14);
     for (let i = 0; i < b.maxHp; i++) {
-      const cx = W / 2 - (b.maxHp - 1) * 22 + i * 44;
-      ctx.fillStyle = i < b.hp ? C.navy : "rgba(233,237,246,.2)"; ctx.fillRect(cx - 14, by + 22, 28, 16);
-      ctx.strokeStyle = "#e9edf6"; ctx.lineWidth = 1.5; ctx.strokeRect(cx - 14, by + 22, 28, 16);
+      const cx = W / 2 - (b.maxHp - 1) * (b.maxHp > 3 ? 18 : 22) + i * (b.maxHp > 3 ? 36 : 44);
+      ctx.fillStyle = i < b.hp ? C.navy : "rgba(233,237,246,.2)"; ctx.fillRect(cx - 13, by + 22, 26, 16);
+      ctx.strokeStyle = "#e9edf6"; ctx.lineWidth = 1.5; ctx.strokeRect(cx - 13, by + 22, 26, 16);
       if (i < b.hp) { ctx.fillStyle = "#fff"; ctx.font = "700 13px 'Pixelify Sans', monospace"; ctx.fillText("?", cx, by + 35); }
     }
   }
@@ -1901,6 +2165,7 @@ function frame(now) {
   drawPlayer();
   ctx.restore();
   drawHUD();
+  drawCinema(clock);
   requestAnimationFrame(frame);
 }
 
