@@ -100,6 +100,11 @@ body{
   user-select:text; -webkit-user-select:text; color-scheme:light;
 }
 .card.wide{max-width:820px}
+.toprow{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap}
+.langsw{display:flex; border:2px solid var(--night); border-radius:4px; overflow:hidden}
+.langsw button{font:700 14px/1 var(--f-display); padding:8px 12px; border:0; background:#fff; color:var(--night); cursor:pointer}
+.langsw button.on{background:var(--night); color:#fff}
+.langsw button:focus-visible{outline:3px solid var(--blue); outline-offset:-3px}
 .eyebrow{font:600 13px/1.2 var(--f-display); letter-spacing:.12em; text-transform:uppercase; color:var(--blue)}
 h1,h2,h3{margin:0; font-family:var(--f-display); text-wrap:balance; color:var(--night)}
 h1{font-size:clamp(40px, 9vw, 76px); line-height:.95; letter-spacing:.02em}
@@ -216,7 +221,8 @@ ul.help{margin:0; padding-left:20px; line-height:1.55; font-size:16px}
 <!-- Titel -->
 <div class="screen" id="scrTitle">
   <div class="card wide">
-    <div class="eyebrow">Informatik · Klasse 10</div>
+    <div class="toprow"><div class="eyebrow">Informatik · Klasse 10</div>
+      <div class="langsw" role="group" aria-label="Sprache / Idioma"><button type="button" id="bLangDe" lang="de">Deutsch</button><button type="button" id="bLangEs" lang="es">Español</button></div></div>
     <h1>Bit-Jäger</h1>
     <p>Die Reise der Nachricht: Bring eine wichtige Botschaft durch die Geschichte – vom Rauchzeichen bis zum Logikgatter. Löse die Aufgaben, sammle Bits und bestehe die Fragen der Hüter jeder Epoche.</p>
     <div class="binary" title="B I T im ASCII-Code">01000010 01001001 01010100</div>
@@ -395,6 +401,12 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 };
+let LANG = store.get("bj_lang", (navigator.language || "de").toLowerCase().startsWith("es") ? "es" : "de");
+const ll = (de, es) => LANG === "es" ? es : de;
+const LO = o => (LANG === "es" && o && o.es) ? Object.assign({}, o, o.es) : o;
+const locW = w => { const x = LO(w); x.boss = LO(w.boss); return x; };
+const GATE_NAME = { de: { UND: "UND", ODER: "ODER", NICHT: "NICHT", NAND: "NAND", NOR: "NOR" }, es: { UND: "AND", ODER: "OR", NICHT: "NOT", NAND: "NAND", NOR: "NOR" } };
+const gn = g => GATE_NAME[LANG][g] || g;
 const SUB = n => String(n).replace(/[0-9]/g, d => "₀₁₂₃₄₅₆₇₈₉"[d]);
 
 // ======================================================================
@@ -756,6 +768,280 @@ const SQ = [
     e: "Reihe = UND, parallel = ODER. Der Strom fließt über E₁ und E₂ – oder über E₃." }
 ];
 
+// ---------- Traducción al español (mismo orden que las preguntas alemanas) ----------
+const ES_Q = {
+Q1: [
+  { q: "Hacia el 3300 a. C. surgió en Mesopotamia una de las primeras escrituras. ¿Cómo se llama?", a: ["Escritura cuneiforme", "Jeroglíficos", "Runas", "Escritura latina"],
+    e: "Los sumerios grababan signos en forma de cuña en tablillas de arcilla húmeda. Así se pudo guardar información de forma duradera por primera vez." },
+  { q: "Con señales de humo solo se podían transmitir muy pocos mensajes distintos. ¿Por qué?", a: ["Cada significado tenía que acordarse antes entre emisor y receptor", "El humo era demasiado caro", "El humo solo se ve de noche", "El humo solo sube cuando no hay viento"],
+    e: "Sin un código común, el receptor no entiende nada. Además hacían falta visibilidad directa y buen tiempo." },
+  { q: "Polibio (siglo II a. C.) colocó las letras en un cuadrado de 5 × 5. Con antorchas se indicaba la fila y la columna. ¿Cuántos signos se pueden representar así?", a: ["25", "10", "5", "32"],
+    e: "5 posibilidades para la fila por 5 para la columna: 5 · 5 = 25 signos." },
+  { q: "Según la leyenda, en el año 490 a. C. un mensajero corrió unos 40 km hasta Atenas para anunciar una victoria. ¿De dónde venía?", a: ["Maratón", "Esparta", "Olimpia", "Troya"],
+    e: "De esa leyenda viene el nombre de la carrera de maratón. Durante mucho tiempo, los mensajeros a pie fueron la conexión más rápida por tierra." },
+  { q: "¿Qué tenía de nuevo la imprenta de Gutenberg hacia 1450?", a: ["Tipos móviles de metal: los textos se podían copiar rápido y en gran cantidad", "Los libros se escribieron por primera vez en papel", "Inventó el alfabeto", "Por primera vez los libros podían llevar ilustraciones"],
+    e: "Antes, cada libro se copiaba a mano. Con tipos reutilizables, la imprenta se convirtió en el primer medio de comunicación de masas." },
+  { q: "Un explorador envía señales de humo a su campamento. ¿Cuál es aquí el canal de transmisión?", a: ["El aire, es decir, la línea de visión entre las colinas", "El explorador", "El mensaje «vienen enemigos»", "El receptor en el campamento"],
+    e: "Modelo de comunicación: emisor (explorador con fuego) → canal (aire, visión) → receptor (campamento). Las perturbaciones como la niebla afectan al canal." },
+  { q: "¿Cómo transmiten mensajes los «tambores parlantes» de África occidental?", a: ["Imitan el tono y el ritmo de la lengua hablada", "Cada golpe es una letra", "Usan código Morse", "Solo el volumen lleva la información"],
+    e: "Muchas lenguas de allí son tonales: la altura del tono cambia el significado. El tambor imita esa melodía." },
+  { q: "¿Por qué se usaban palomas mensajeras?", a: ["Siempre vuelven con seguridad a su palomar", "Pueden volar a cualquier lugar", "Pueden aprenderse los mensajes de memoria", "Vuelan más rápido que el sonido"],
+    e: "Las palomas solo vuelan a casa. Por eso había que llevarlas antes al lugar de envío: una calle de sentido único." },
+  { q: "¿Qué necesita toda transmisión de mensajes, desde las señales de humo hasta el móvil?", a: ["Emisor, canal de transmisión, receptor y un código común", "Electricidad y un cable", "Escritura y papel", "Un mensajero humano"],
+    e: "Estos elementos básicos valen para todas las épocas. Solo cambia la técnica del canal y del código." },
+  { q: "Una hoguera de señales solo puede mostrar «encendida» o «apagada». ¿Cuántos mensajes distintos se pueden representar con 3 hogueras?", a: ["8", "3", "6", "9"],
+    e: "Cada hoguera tiene 2 estados: 2 · 2 · 2 = 2³ = 8. ¡Exactamente así se calcula después con bits!" },
+  { q: "¿Qué hallazgo permitió descifrar los jeroglíficos egipcios?", a: ["La piedra de Rosetta", "El disco celeste de Nebra", "La tumba de Tutankamón", "La puerta de Ishtar"],
+    e: "En la piedra aparece el mismo texto en tres escrituras. Con ella, Jean-François Champollion logró descifrarlos en 1822." },
+  { q: "¿Cómo se llamaba el servicio estatal de correos del Imperio romano?", a: ["Cursus publicus", "Vía Apia", "Foro romano", "Limes"],
+    e: "A lo largo de las calzadas romanas había postas para cambiar de caballo. Así las órdenes cruzaban rápido el gran imperio." },
+  { q: "Desde 1490, la familia Tassis (Taxis) organizó un correo para los Habsburgo. ¿Qué lo hacía tan rápido?", a: ["Postas fijas donde se cambiaba de jinete y de caballo", "Las cartas viajaban en barco por los ríos", "Los mensajes se transmitían con espejos", "Un mensajero recorría todo el camino sin parar"],
+    e: "Gracias a los relevos con caballos descansados, el correo viajaba de día y de noche." },
+  { q: "¿Qué tenían que hacer sí o sí el emisor y el receptor antes de usar señales de humo?", a: ["Acordar qué significa cada señal", "Encontrarse en persona", "Encender un fuego en el mismo sitio", "Aprender una escritura común"],
+    e: "Sin un acuerdo común, el receptor no entiende nada. Esto sigue valiendo hoy para cualquier tipo de comunicación." },
+  { q: "¿Cómo avisaban las torres de vigilancia en China de que se acercaban enemigos?", a: ["Con columnas de humo", "Con espejos", "Con campanas de iglesia", "Con palomas mensajeras"],
+    e: "La señal de humo pasaba de torre en torre, mucho más rápido que cualquier jinete." },
+  { q: "¿Cómo podían distinguirse distintos mensajes con señales de tambor?", a: ["Tocar rápido significaba algo distinto que tocar lento", "Por el color del tambor", "Por el tamaño del tambor", "De ninguna forma: solo había un mensaje"],
+    e: "El ritmo era el código. También aquí emisor y receptor tenían que acordarlo antes." },
+  { q: "¿Qué ejemplo de la vida diaria es, como las señales de humo, un significado acordado de una señal?", a: ["Los colores del semáforo", "Un chaparrón", "La salida del sol", "Una piedra en el camino"],
+    e: "El rojo significa «alto» porque todos lo hemos acordado. El timbre del colegio, el intermitente o los emojis funcionan igual." },
+  { q: "¿Hasta cuándo se usaron palomas mensajeras para mensajes secretos?", a: ["Todavía en la Segunda Guerra Mundial", "Solo en la Antigüedad", "Solo en la Edad Media", "Hasta aproximadamente 1500"],
+    e: "Durante mucho tiempo las palomas fueron más rápidas que cualquier jinete, y se usaron aún en el siglo XX." }
+],
+B1: [
+  { q: "Antes de la imprenta, ¿quién copiaba sobre todo los libros en la Edad Media?", a: ["Los monjes en los scriptoria de los monasterios", "Los comerciantes en los mercados", "Los caballeros en sus castillos", "Los impresores en las ciudades"],
+    e: "En los scriptoria se copiaban los libros letra a letra. Una Biblia podía llevar años." },
+  { q: "¿Cuál es la obra impresa más famosa de Gutenberg?", a: ["La Biblia", "Un diccionario", "La Odisea", "Una enciclopedia"],
+    e: "La Biblia de Gutenberg, con 42 líneas por columna, se imprimió hacia 1454 en Maguncia." },
+  { q: "Los espartanos enrollaban una tira de cuero en un bastón de madera y escribían sobre ella. ¿Cómo se llama este método?", a: ["Escítala", "Cifrado César", "Enigma", "Cuadrado de Polibio"],
+    e: "Sin un bastón del mismo grosor, las letras aparecen desordenadas. Es una transposición: las letras son las mismas, solo cambia su orden." },
+  { q: "César desplazaba cada letra 3 posiciones en el alfabeto. ¿En qué se convierte «ROMA»?", a: ["URPD", "SPNB", "OLJX", "QNLZ"],
+    e: "R → U, O → R, M → P, A → D. La clave es el desplazamiento de 3." },
+  { q: "¿Por qué el pergamino de piel animal era más valioso que el papiro?", a: ["Es más duradero y se puede escribir por las dos caras", "Es transparente", "Es más fácil de fabricar", "No puede arder"],
+    e: "El pergamino dura siglos y se puede doblar y encuadernar. A veces incluso se raspaba y se volvía a escribir." },
+  { q: "A partir de 1517, gracias a la imprenta, se difundieron muy rápido las tesis de …", a: ["Martín Lutero", "Carlomagno", "Isaac Newton", "Galileo Galilei"],
+    e: "Los panfletos impresos llegaron en pocas semanas a toda Alemania. Sin imprenta habría sido casi imposible." },
+  { q: "Una señal con antorcha muestra «izquierda» o «derecha». ¿Cuántas señales necesitas como mínimo para 16 mensajes distintos?", a: ["4", "8", "16", "3"],
+    e: "Con n señales de 2 estados hay 2ⁿ posibilidades. 2⁴ = 16." },
+  { q: "¿Qué significa la palabra griega «telégrafo»?", a: ["Escritura a distancia", "Corredor rápido", "Mensajero de luz", "Portador de sonido"],
+    e: "Tele = lejos, graphein = escribir. ¡Con esto seguimos en el mundo 2!" }
+],
+Q2: [
+  { q: "Desde 1794, torres con brazos móviles de señales unían París y Lille. ¿Cómo se llama este invento de Claude Chappe?", a: ["Telégrafo óptico", "Telégrafo eléctrico", "Torre de radio", "Correo neumático"],
+    e: "Un vigilante leía con un catalejo la posición de los brazos de la torre vecina y la transmitía. Así un mensaje recorría cientos de kilómetros en minutos, pero solo de día y con buena visibilidad." },
+  { q: "¿Quién desarrolló a partir de 1837, con Alfred Vail, el código telegráfico más conocido?", a: ["Samuel Morse", "Alexander Graham Bell", "Guglielmo Marconi", "Thomas Edison"],
+    e: "El código Morse está formado por señales cortas y largas (· y −) con pausas entre ellas." },
+  { q: "¿Qué significa este código Morse?", a: ["SOS", "OSO", "SMS", "ESO"],
+    e: "S = ··· y O = −−−. SOS se fijó en 1906 como llamada internacional de socorro porque es fácil de enviar y de reconocer." },
+  { q: "En el código Morse, la E tiene un solo signo: un punto. ¿Por qué?", a: ["La E es la letra más frecuente: los signos frecuentes reciben los códigos más cortos", "La E es la primera vocal del alfabeto", "Un punto es lo más fácil de oír", "Se decidió por sorteo"],
+    e: "Así los mensajes son más cortos de media. Este principio está también en los métodos actuales de compresión de datos." },
+  { q: "En 1833, dos científicos construyeron en Gotinga uno de los primeros telégrafos electromagnéticos. ¿Quiénes fueron?", a: ["Carl Friedrich Gauss y Wilhelm Weber", "Werner von Siemens y Johann Halske", "Samuel Morse y Alfred Vail", "Graham Bell y Thomas Watson"],
+    e: "Su línea unía el observatorio con el Instituto de Física, a casi un kilómetro de distancia." },
+  { q: "¿Desde cuándo hubo una conexión telegráfica estable a través del Atlántico?", a: ["1866", "1766", "1912", "1950"],
+    e: "Un primer cable de 1858 dejó de funcionar a las pocas semanas. Desde 1866, un mensaje de Europa a América tardaba minutos en vez de días de viaje en barco." },
+  { q: "¿Quién registró en 1876 en EE. UU. la patente del teléfono?", a: ["Alexander Graham Bell", "Thomas Edison", "Philipp Reis", "Werner von Siemens"],
+    e: "El alemán Philipp Reis ya había presentado un teléfono en 1861. Su famosa frase de prueba: «El caballo no come ensalada de pepino»." },
+  { q: "¿Quién demostró en 1886 la existencia de las ondas electromagnéticas, la base de la radio?", a: ["Heinrich Hertz", "Guglielmo Marconi", "Georg Simon Ohm", "Alessandro Volta"],
+    e: "La unidad de frecuencia lleva su nombre: 1 hercio = 1 oscilación por segundo." },
+  { q: "¿Qué consiguió Guglielmo Marconi en 1901?", a: ["Envió una señal de radio a través del Atlántico", "Hizo la primera llamada telefónica", "Inventó la bombilla", "Transmitió la primera imagen de televisión"],
+    e: "¡Sin cables! La telegrafía sin hilos salvó después muchas vidas en el mar." },
+  { q: "¿Qué palabra es?", morse: "·− ·−·· ·− ·−· −− ·−", hint: "A = ·−   L = ·−··   R = ·−·   M = −−", a: ["ALARMA", "ARMADA", "LLAMAR", "PALMAR"],
+    e: "·− = A, ·−·· = L, ·− = A, ·−· = R, −− = M, ·− = A." },
+  { q: "¿Qué ventaja tenía el telégrafo eléctrico frente al óptico?", a: ["Funcionaba también de noche y con niebla, y era mucho más rápido", "No necesitaba electricidad", "Podía transmitir imágenes", "No necesitaba cables"],
+    e: "A la corriente en el cable no le importan ni el tiempo ni la hora del día." },
+  { q: "El código Morse solo conoce en el fondo dos tipos de señal: corta y larga. ¿Cómo se llama un sistema con dos estados?", a: ["Binario", "Decimal", "Hexadecimal", "Analógico"],
+    e: "Binario = de dos valores. En esto se basan más tarde los bits y los ordenadores." },
+  { q: "¿Qué orden de los inventos es correcto?", a: ["Telar de tarjetas perforadas 1804 – telégrafo 1837 – teléfono 1876 – radio 1895", "Telégrafo 1804 – telar de tarjetas perforadas 1837 – radio 1876 – teléfono 1895", "Teléfono 1837 – telégrafo 1876 – radio 1804 – telar de tarjetas perforadas 1895", "Radio 1804 – teléfono 1837 – telar de tarjetas perforadas 1876 – telégrafo 1895"],
+    e: "1804 el telar de Jacquard, 1837 el telégrafo de Morse, 1876 el teléfono de Bell, 1895 la radio de Marconi." },
+  { q: "¿Quién hizo desde 1804 que los telares tejieran dibujos automáticamente con tarjetas perforadas?", a: ["Joseph-Marie Jacquard", "Herman Hollerith", "Samuel Morse", "Konrad Zuse"],
+    e: "La tarjeta perforada fue la primera técnica con la que una máquina podía leer y procesar información." },
+  { q: "En 1890, Herman Hollerith analizó el censo de EE. UU. con tarjetas perforadas. ¿Qué se consiguió?", a: ["Dos años de trabajo en vez de ocho", "Ocho años de trabajo en vez de dos", "Se suprimió el censo", "Nada, era demasiado caro"],
+    e: "La empresa de Hollerith pasó a formar parte de IBM, durante décadas el mayor fabricante de ordenadores del mundo." },
+  { q: "¿Cómo guarda información una tarjeta perforada?", a: ["Agujero = sí, sin agujero = no", "Por el color de la tarjeta", "Con una banda magnética", "Con letras impresas"],
+    e: "Cada posición es una decisión sí/no, igual que después el 1 y el 0 en el ordenador." },
+  { q: "¿Qué signo Morse es la letra S?", a: ["· · ·", "− − −", "· −", "− · −"],
+    e: "S = tres señales cortas, O = tres largas." },
+  { q: "¿Qué podía hacer el teléfono (1876) que el telégrafo no podía?", a: ["Transmitir la propia voz", "Enviar mensajes sin cable", "Transmitir imágenes", "Guardar mensajes"],
+    e: "Con el telégrafo había que teclear señales Morse; con el teléfono bastaba con hablar." },
+  { q: "¿Quién demostró en 1895 que los mensajes también se pueden transmitir sin cables?", a: ["Guglielmo Marconi", "Alexander Graham Bell", "Samuel Morse", "Joseph-Marie Jacquard"],
+    e: "La radio con ondas electromagnéticas es la base de la radio, la televisión, el wifi y la telefonía móvil." }
+],
+B2: [
+  { q: "¿Cómo se escribe SOS en código Morse?", a: ["··· −−− ···", "−−− ··· −−−", "·−· ·−· ·−·", "···· −−− ····"],
+    e: "S = tres señales cortas, O = tres largas." },
+  { q: "¿Qué transmite un teléfono clásico por el cable?", a: ["La voz como una tensión eléctrica que cambia continuamente", "Señales Morse", "Letras sueltas", "Luz"],
+    e: "El micrófono convierte las vibraciones del sonido en oscilaciones eléctricas y el auricular las vuelve a convertir en sonido. La señal es analógica." },
+  { q: "¿Cuál es la diferencia entre señales analógicas y digitales?", a: ["Lo analógico es continuo; lo digital solo conoce unos pocos valores fijos, por ejemplo 0 y 1", "Lo analógico siempre es más rápido", "Lo digital solo funciona con luz", "No hay ninguna diferencia"],
+    e: "Las señales digitales se pueden copiar sin errores y proteger bien frente a perturbaciones." },
+  { q: "En 1912, el Titanic envió llamadas de socorro. ¿De qué manera?", a: ["Con señales Morse por radio", "Por teléfono", "Con hogueras", "Por un cable submarino"],
+    e: "Los radiotelegrafistas usaron la telegrafía sin hilos. Los barcos cercanos recibieron las señales Morse." },
+  { q: "¿Cuántos signos distintos se pueden formar con un máximo de dos símbolos Morse (· o −)?", a: ["6", "4", "8", "2"],
+    e: "Con un símbolo: 2 (· y −). Con dos símbolos: 2 · 2 = 4. En total 2 + 4 = 6." },
+  { q: "¿Por qué hacían falta estaciones de relé en las líneas telegráficas largas?", a: ["La señal se debilita en distancias largas y hay que renovarla", "Para que los telegrafistas descansaran", "Para cifrar los mensajes", "Porque la corriente solo va cuesta abajo"],
+    e: "Un relé usa la señal débil que llega para conectar un circuito nuevo y fuerte." },
+  { q: "Tarjeta perforada: agujero o sin agujero. ¿Qué tiene que ver eso con los ordenadores?", a: ["Son exactamente dos estados, como el 0 y el 1", "Los ordenadores están hechos de papel", "Nada", "Los ordenadores solo saben leer agujeros"],
+    e: "«Agujero o no», «sí o no», «encendido o apagado», «0 o 1»: ese es el principio de todo ordenador." }
+],
+Q3: [
+  null, null, null,
+  { q: "¿Qué es un bit?", a: ["La unidad de información más pequeña: 0 o 1", "Un paquete de 8 caracteres", "Una sola letra", "Una pieza del ordenador"],
+    e: "Bit viene de «binary digit»: dígito binario." },
+  { q: "¿Cuántos bits tiene un byte?", a: ["8", "4", "10", "16"],
+    e: "1 byte = 8 bits. Con ello se pueden representar 2⁸ = 256 valores distintos." },
+  { q: "¿Qué número decimal es 1011₂?", a: ["11", "13", "9", "1011"],
+    e: "1·8 + 0·4 + 1·2 + 1·1 = 11." },
+  { q: "¿Cómo se escribe el número 6 en binario?", a: ["110", "101", "011", "111"],
+    e: "6 = 4 + 2 → 1·4 + 1·2 + 0·1 = 110₂." },
+  { q: "¿Cuántos valores distintos puede representar un byte?", a: ["256", "255", "8", "128"],
+    e: "2⁸ = 256 valores, es decir, del 0 al 255." },
+  { q: "¿Qué valores de posición tiene un número binario de cuatro cifras, de izquierda a derecha?", a: ["8 – 4 – 2 – 1", "1000 – 100 – 10 – 1", "4 – 3 – 2 – 1", "16 – 8 – 4 – 2"],
+    e: "Cada posición hacia la izquierda vale el doble: 2³, 2², 2¹, 2⁰." },
+  { q: "¿Cuánto es 0101₂ + 0011₂?", a: ["1000₂", "0110₂", "1001₂", "0111₂"],
+    e: "5 + 3 = 8, y 8 = 1000₂." },
+  { q: "En el código ASCII, la «A» tiene el valor 65. ¿Qué valor tiene la «C»?", a: ["67", "66", "68", "99"],
+    e: "Las mayúsculas van seguidas: A = 65, B = 66, C = 67." },
+  { q: "¿Cómo se reconoce que un número binario es par?", a: ["La última cifra es 0", "La primera cifra es 1", "Tiene un número par de unos", "Tiene 8 cifras"],
+    e: "La última cifra vale 1. Si es 0, el número es divisible entre 2." },
+  { q: "¿Quién construyó en 1941, con la Z3, el primer ordenador programable que funcionaba?", a: ["Konrad Zuse", "Alan Turing", "Bill Gates", "Charles Babbage"],
+    e: "La Z3 calculaba en sistema binario, con unos 2000 relés." },
+  { q: "¿Cuántos bits hacen falta como mínimo para representar los números del 0 al 15?", a: ["4", "3", "5", "15"],
+    e: "Con 4 bits hay 2⁴ = 16 valores: del 0 al 15." },
+  { q: "¿Qué significa el 2 pequeño en 11₂?", a: ["Que es un número binario", "Que el número se duplica", "Que es once al cuadrado", "Que es el segundo número"],
+    e: "11₂ es un número binario: 1·2 + 1·1 = 3. ¡No es once!" },
+  { q: "¿Qué valor tiene 10101₂?", a: ["21", "17", "25", "10101"],
+    e: "16 + 4 + 1 = 21." },
+  { q: "¿Cómo se escribe 23 en binario?", a: ["10111", "11011", "10101", "11101"],
+    e: "23 = 16 + 4 + 2 + 1 → 10111₂." },
+  { q: "¿Cómo se escribe 30 en binario?", a: ["11110", "11101", "10110", "11111"],
+    e: "30 = 16 + 8 + 4 + 2 → 11110₂." },
+  { q: "¿Cuántos números distintos se pueden representar con 5 bits?", a: ["32", "31", "25", "10"],
+    e: "2⁵ = 32 números, es decir, del 0 al 31." },
+  { q: "Truco de magia: el número que has pensado está en las tarjetas con los valores 1, 4 y 16. ¿Qué número es?", a: ["21", "20", "13", "64"],
+    e: "Se suman los valores de las tarjetas: 1 + 4 + 16 = 21. Sí significa 1 y no significa 0: 10101₂." },
+  { q: "Truco de magia: ¿en qué tarjetas está el número 13?", a: ["En las tarjetas 8, 4 y 1", "En las tarjetas 8 y 5", "En las tarjetas 16 y 1", "En las cinco tarjetas"],
+    e: "13 = 8 + 4 + 1 = 01101₂. Cada tarjeta es un valor de posición." },
+  { q: "¿Por qué funciona el truco de magia de las tarjetas numéricas?", a: ["Cada tarjeta representa un valor de posición: sí = 1, no = 0", "Las tarjetas están marcadas en secreto", "Se pueden leer los pensamientos", "Porque solo hay cinco números"],
+    e: "Las tarjetas muestran los valores de posición 1, 2, 4, 8 y 16. Quien los suma está convirtiendo un número binario." },
+  { q: "Mensaje secreto (A = 1, B = 2 … Z = 26, sin la Ñ): ¿qué letra es 01111₂?", a: ["O", "M", "P", "N"],
+    e: "01111₂ = 8 + 4 + 2 + 1 = 15. La letra número 15 es la O." },
+  { q: "Mensaje secreto (A = 1 … Z = 26, sin la Ñ): ¿qué palabra es 00011 · 00001 · 10011 · 00001?", a: ["CASA", "CAMA", "COSA", "MASA"],
+    e: "3 = C, 1 = A, 19 = S, 1 = A." },
+  { q: "Con A = 1 … Z = 26: ¿cómo se escribe la letra I como número binario de 5 bits?", a: ["01001", "01010", "10010", "01000"],
+    e: "La I es la letra número 9: 9 = 8 + 1 → 01001₂." }
+],
+B3: [
+  null,
+  { q: "Convierte 10011₂ en un número decimal.", a: ["19", "17", "21", "35"],
+    e: "16 + 0 + 0 + 2 + 1 = 19." },
+  { q: "¿Qué número binario es el 42?", a: ["101010", "110010", "100110", "101100"],
+    e: "42 = 32 + 8 + 2 → 101010₂." },
+  { q: "¿Qué valor tiene 1111 1111₂?", a: ["255", "256", "128", "511"],
+    e: "128 + 64 + 32 + 16 + 8 + 4 + 2 + 1 = 255, el valor más alto de un byte." },
+  { q: "¿Qué le pasa a un número binario si se le añade un 0 a la derecha?", a: ["Su valor se duplica", "Su valor se multiplica por diez", "No cambia", "Se reduce a la mitad"],
+    e: "Todas las cifras se desplazan una posición a la izquierda y cada una vale el doble. 101₂ = 5 → 1010₂ = 10." },
+  { q: "¿Por qué los ordenadores calculan en sistema binario?", a: ["Los interruptores electrónicos tienen dos estados fáciles de distinguir: encendido y apagado", "Porque hay menos cifras que aprender", "Porque Leibniz lo ordenó así", "Porque los números decimales son demasiado grandes"],
+    e: "Pasa corriente o no pasa, tensión alta o baja: eso es muy resistente a las perturbaciones." },
+  { q: "Mensaje secreto (A = 1 … Z = 26, sin la Ñ): ¿qué palabra es 01001 · 01110 · 00110 · 01111?", a: ["INFO", "INCA", "FINO", "NIDO"],
+    e: "9 = I, 14 = N, 6 = F, 15 = O." },
+  { q: "¿Cuál es el número más grande que se puede escribir con 5 bits?", a: ["31", "32", "16", "63"],
+    e: "11111₂ = 16 + 8 + 4 + 2 + 1 = 31." },
+  null
+],
+Q4: [
+  null, null, null,
+  { q: "Puerta AND: ¿cuándo se enciende el LED de la salida A?", a: ["Solo si E₁ = 1 y E₂ = 1", "Si al menos una entrada es 1", "Si las dos entradas son 0", "Siempre"],
+    e: "AND: A solo es 1 cuando todas las entradas son 1." },
+  { q: "Puerta OR: ¿cuándo se queda apagado el LED A?", a: ["Solo si E₁ = 0 y E₂ = 0", "Si una entrada es 0", "Si las dos entradas son 1", "Nunca"],
+    e: "OR: basta con una sola entrada a 1 para que A = 1." },
+  { q: "¿Se enciende el LED A?", a: ["No, A = 0", "Sí, A = 1"],
+    e: "En la puerta AND las dos entradas tienen que ser 1. E₂ = 0, así que A = 0." },
+  { q: "¿Se enciende el LED A?", a: ["Sí, A = 1", "No, A = 0"],
+    e: "En la puerta OR basta con una entrada a 1." },
+  { q: "¿Cuántas filas tiene la tabla de verdad de una puerta con dos entradas E₁ y E₂?", a: ["4", "2", "3", "8"],
+    e: "00, 01, 10, 11: es decir, 2² = 4 combinaciones." },
+  { q: "Dos pulsadores están conectados en serie delante de un LED. ¿A qué función lógica corresponde?", a: ["AND", "OR", "NOT", "A ninguna"],
+    e: "Solo pasa corriente si los dos pulsadores están pulsados." },
+  { q: "Dos pulsadores están conectados en paralelo delante de un LED. ¿A qué función lógica corresponde?", a: ["OR", "AND", "NOT", "A ninguna"],
+    e: "Basta con que uno de los dos pulsadores esté pulsado." },
+  { q: "¿Qué signo aparece en el símbolo de una puerta AND?", a: ["&", "≥1", "1", "=1"],
+    e: "& significa AND, ≥1 significa OR, y 1 con un círculo en la salida significa NOT." },
+  { q: "¿Qué función tiene un transistor en un circuito lógico?", a: ["Funciona como un interruptor electrónico", "Guarda música", "Produce luz", "Sustituye a la pila"],
+    e: "Una pequeña tensión en la base conecta o desconecta la corriente entre colector y emisor." },
+  null, null,
+  { q: "¿Qué es un pulsador NC (normalmente cerrado)?", a: ["Un interruptor que en reposo está cerrado y al pulsarlo interrumpe la corriente", "Un interruptor que en reposo está abierto y al pulsarlo se cierra", "Un componente que almacena corriente", "Un LED especialmente brillante"],
+    e: "En el pulsador NA (normalmente abierto) es al revés: en reposo abierto, al pulsar cerrado." },
+  { q: "Un LED y un pulsador NC en serie. ¿Qué función básica es?", a: ["NOT", "AND", "OR", "NAND"],
+    e: "En reposo (E₁ = 0) el LED está encendido; al pulsar (E₁ = 1) se apaga. La entrada se invierte." },
+  { q: "Dos pulsadores NC en paralelo delante de un LED. ¿Qué función básica es?", a: ["NAND", "NOR", "AND", "OR"],
+    e: "El LED solo se apaga si se pulsan los dos (1 y 1). Es el AND invertido." },
+  { q: "Dos pulsadores NC en serie delante de un LED. ¿Qué función básica es?", a: ["NOR", "NAND", "AND", "OR"],
+    e: "El LED solo está encendido si no se pulsa ninguno (0 y 0). Es el OR invertido." },
+  { q: "Vida diaria: la lavadora solo arranca si la puerta está cerrada y se pulsa el botón de inicio.", a: ["AND", "OR", "NOT", "NOR"],
+    e: "Se tienen que cumplir las dos condiciones." },
+  { q: "Vida diaria: la luz interior del coche se enciende en cuanto se abre la puerta del conductor o la del copiloto.", a: ["OR", "AND", "NOT", "NAND"],
+    e: "Basta con una puerta abierta." },
+  { q: "Vida diaria: si se pulsa la seta de emergencia, se corta la corriente de todas las máquinas.", a: ["NOT", "AND", "OR", "NOR"],
+    e: "Pulsado (1) significa corriente cortada (0): técnicamente, una seta de emergencia es un pulsador NC." },
+  { q: "Vida diaria: la alarma salta si se abre la puerta o la ventana.", a: ["OR", "AND", "NOT", "NAND"],
+    e: "Una sola de las dos condiciones ya dispara la alarma." }
+],
+B4: [
+  null, null,
+  { q: "E₁ = 1, E₂ = 0. ¿Con qué puertas se enciende el LED A?", a: ["Solo con OR", "Solo con AND", "Con AND y con OR", "Con ninguna"],
+    e: "AND necesita dos unos; a OR le basta con uno." },
+  { q: "¿Qué columna A corresponde a la puerta OR? (E₁E₂ = 00, 01, 10, 11)", a: ["0, 1, 1, 1", "0, 0, 0, 1", "1, 1, 1, 0", "1, 0, 0, 0"],
+    e: "A solo vale 0 con 00." },
+  { q: "Se conecta una puerta NOT detrás de una puerta AND. ¿Cómo se llama la nueva función?", a: ["NAND", "NOR", "XOR", "OR"],
+    e: "NAND = NOT-AND. Con puertas NAND se pueden construir todas las demás funciones básicas." },
+  { q: "Puerta NOT: E₁ = 1. ¿Qué muestra el LED A?", a: ["Está apagado, A = 0", "Está encendido, A = 1"],
+    e: "La puerta NOT invierte la entrada." },
+  null, null,
+  { q: "Puerta NAND: ¿con qué entrada es A = 0?", a: ["Solo con E₁ = 1 y E₂ = 1", "Solo con E₁ = 0 y E₂ = 0", "Siempre", "Nunca"],
+    e: "Regla: NAND solo da 0 con 1 y 1; si no, siempre 1." },
+  { q: "Puerta NOR: ¿con qué entrada es A = 1?", a: ["Solo con E₁ = 0 y E₂ = 0", "Solo con E₁ = 1 y E₂ = 1", "En cuanto una entrada es 1", "Nunca"],
+    e: "Regla: NOR solo da 1 con 0 y 0; si no, siempre 0." },
+  { q: "¿Por qué la electrónica construye casi todo con puertas NAND?", a: ["Con NAND se pueden construir todas las demás funciones básicas", "Las puertas NAND brillan más", "NAND no necesita corriente", "Las otras puertas no se venden"],
+    e: "NAND es una «puerta universal»: con puertas NAND se pueden construir NOT, AND, OR y todas las demás." },
+  { q: "¿Cómo se convierte una puerta NAND en una puerta NOT?", a: ["Se unen las entradas E₁ y E₂", "Se da la vuelta al LED", "Se conecta un segundo LED", "Se invierte la polaridad de la pila"],
+    e: "Entonces solo quedan las filas 00 → 1 y 11 → 0. Eso es exactamente NOT." },
+  { q: "Con pulsadores NA se cumple: serie = AND, paralelo = OR. ¿Qué se cumple con pulsadores NC?", a: ["Serie = NOR, paralelo = NAND", "Serie = AND, paralelo = OR", "Serie = NAND, paralelo = NOR", "Serie = OR, paralelo = AND"],
+    e: "Con el pulsador NC todo está «al revés»: es la lógica espejo." },
+  { q: "¿Se enciende el LED A?", a: ["No, A = 0", "Sí, A = 1"],
+    e: "NAND solo da 0 con E₁ = 1 y E₂ = 1." },
+  { q: "¿Se enciende el LED A?", a: ["Sí, A = 1", "No, A = 0"],
+    e: "NOR solo da 1 con E₁ = 0 y E₂ = 0." }
+],
+SQ: [
+  { q: "A = (E₁ AND E₂) OR E₃. Se cumple E₁ = 1, E₂ = 0, E₃ = 0. ¿Qué muestra el LED A?", a: ["A = 0, el LED está apagado", "A = 1, el LED está encendido"],
+    e: "E₁ AND E₂ = 1 AND 0 = 0. Después, 0 OR E₃ = 0 OR 0 = 0." },
+  { q: "A = NOT (E₁ OR E₂). ¿A qué función básica corresponde esta combinación?", a: ["NOR", "NAND", "AND", "XOR"],
+    e: "Una OR con la salida invertida es exactamente NOR." },
+  { q: "¿Cuántas puertas NAND hacen falta como mínimo para construir una AND?", a: ["2", "1", "3", "4"],
+    e: "La primera NAND da NOT-AND. Una segunda NAND con las entradas unidas vuelve a invertir el resultado: AND." },
+  { q: "¿Cuántas puertas NAND hacen falta como mínimo para construir una OR?", a: ["3", "2", "1", "4"],
+    e: "Dos puertas NAND como NOT delante de las entradas y una tercera NAND: NOT E₁ NAND NOT E₂ = E₁ OR E₂." },
+  { q: "¿Qué función da (NOT E₁) NAND (NOT E₂)?", a: ["OR", "AND", "NOR", "NOT"],
+    e: "Es una de las leyes de De Morgan: una NAND con las entradas invertidas se convierte en OR." },
+  { q: "Una puerta da A = 1 cuando exactamente una de las dos entradas es 1. ¿Cómo se llama?", a: ["XOR (OR exclusiva)", "OR", "NAND", "NOR"],
+    e: "En la XOR, A = 0 cuando las dos entradas son iguales (00 o 11)." },
+  { q: "¿Con qué combinación se puede construir una XOR a partir de funciones básicas?", a: ["(E₁ OR E₂) AND NOT (E₁ AND E₂)", "(E₁ AND E₂) OR NOT (E₁ OR E₂)", "NOT (E₁ OR E₂)", "(E₁ AND E₂) AND E₂"],
+    e: "«Al menos una» (OR), pero «no las dos» (NOT AND): exactamente una." },
+  { q: "Escalera: la luz se puede conmutar abajo y arriba. Cada vez que se mueve un interruptor cambia el estado. ¿Qué función es?", a: ["XOR", "AND", "OR", "NAND"],
+    e: "Es el circuito conmutado: la luz está encendida cuando los interruptores están en posiciones distintas, es decir, XOR." },
+  { q: "¿Cuántas filas tiene la tabla de verdad de un circuito con tres entradas E₁, E₂ y E₃?", a: ["8", "6", "9", "3"],
+    e: "Cada entrada tiene 2 estados: 2 · 2 · 2 = 2³ = 8 combinaciones." },
+  { q: "A = (E₁ OR E₂) AND E₃. ¿En cuántas de las 8 combinaciones de entrada se enciende el LED A?", a: ["3", "4", "1", "5"],
+    e: "E₃ tiene que ser 1, y E₁E₂ puede ser 01, 10 u 11: 3 casos." },
+  { q: "Un semisumador suma dos bits. ¿Qué puertas necesita para la suma y el acarreo?", a: ["XOR para la suma, AND para el acarreo", "OR para la suma, AND para el acarreo", "AND para la suma, XOR para el acarreo", "NOR para las dos cosas"],
+    e: "1 + 1 = 10₂: suma 0 (XOR), acarreo 1 (AND). Así empieza toda unidad de cálculo de un procesador." },
+  { q: "Dos pulsadores NA E₁ y E₂ en serie y un tercero, E₃, en paralelo a ambos. ¿Qué combinación controla el LED?", a: ["(E₁ AND E₂) OR E₃", "(E₁ OR E₂) AND E₃", "E₁ AND E₂ AND E₃", "E₁ OR E₂ OR E₃"],
+    e: "Serie = AND, paralelo = OR. La corriente pasa por E₁ y E₂, o por E₃." }
+]
+};
+
+[["Q1", Q1], ["B1", B1], ["Q2", Q2], ["B2", B2], ["Q3", Q3], ["B3", B3], ["Q4", Q4], ["B4", B4], ["SQ", SQ]].forEach(([k, arr]) =>
+  arr.forEach((q, i) => { const t = ES_Q[k][i]; if (t) q.es = t; }));
+
 // ======================================================================
 //  SPRITES
 // ======================================================================
@@ -791,6 +1077,9 @@ const HEROES = [
   { id: "funki", name: "Funki", perk: "Funk-Tipp", desc: "Zweimal pro Welt verschwinden zwei falsche Antworten.", rows: FOX,
     pal: { f: "#e8782f", F: "#e8782f", w: "#fbeee0", e: "#1a1a2a", n: "#1a1a2a", p: "#b8551d", o: "#3a2a20" }, jump: 1, speed: 1, hearts: 3, jokers: 2 }
 ];
+[{ perk: "Supersalto", desc: "Salta mucho más alto." }, { perk: "Velocista", desc: "Corre un 20 % más rápido." },
+ { perk: "Batería extra", desc: "Empieza con 4 corazones en vez de 3." }, { perk: "Pista por radio", desc: "Dos veces por mundo desaparecen dos respuestas falsas." }]
+ .forEach((e, i) => HEROES[i].es = e);
 HEROES.forEach(h => {
   h.frames = [sprite(h.rows.concat(LEGS_A), h.pal), sprite(h.rows.concat(LEGS_B), h.pal)];
   h.gameFrames = h.frames.map(f => outline(f, "rgba(232,237,248,.9)"));
@@ -820,13 +1109,13 @@ const HEAD = sprite([
   "...nnnn..nnnn...", "...nnnn..nnnn...", "...nnnN..Nnnn...", "...nnnN..Nnnn...", "...oooo..oooo...", "................"
 ], { y: "#ecd06e", Y: "#c9a440", s: "#f2c8a2", k: "#1c1c24", e: "#6b3f1f", c: "#eba293", m: "#b4545a", r: "#1f3f8f", R: "#16306e", w: "#fbf7f2", n: "#172a5c", N: "#24397a", g: "#c9a54a", d: "#d9b294", o: "#1a1a22", b: "#c9a54a" });
 
-// Physiklehrer: Haare halb blond, halb braun mit Seitenscheitel, braune Augen, schwarzes T-Shirt, braune Hose
+// Physiklehrer: Haare gleichmäßig blond-braun meliert mit Seitenscheitel, schwarze Brille, braune Augen, schwarzes T-Shirt, braune Hose
 const PHYS = sprite([
-  "......yyyyy.....", "....hhsyyyyyyy..", "...hhhyyyyyyyyy.", "...hhssssssssyy.", "...hssussusshh..", "....sssSSsss....",
-  "....ssssssss....", ".....smmmms.....", "......ssss......", "..kkkkkkkkkkkk..", ".kkkkkkkkkkkkkk.", ".kkkkkkkzkkkkkk.",
-  ".sKkkkkzkkkkkKs.", ".sKkkkzzzkkkkKs.", ".sKkkkkkzkkkkKs.", "..kkkkkkzkkkkk..", "...LLLLLLLLLL...", "...bbbbbbbbbb...",
+  ".....hyhyhy.....", "....yhshyhyhy...", "...hyhshyhyhyh..", "...hssssssssh...", "...hkkksskkkh...", "...hkuksskukh...",
+  "....sssSSsss....", ".....smmmms.....", "......ssss......", "..kkkkkkkkkkkk..", ".kkkkkkkkkkkkkk.", ".kkkkkkkkkkkkkk.",
+  ".sKkkkkkkkkkkKs.", ".sKkkkkkkkkkkKs.", ".sKkkkkkkkkkkKs.", "..kkkkkkkkkkkk..", "...LLLLLLLLLL...", "...bbbbbbbbbb...",
   "...bbbb..bbbb...", "...bbbb..bbbb...", "...bbbB..Bbbb...", "...bbbB..Bbbb...", "...oooo..oooo...", "................"
-], { y: "#ecca6a", h: "#6b4a2b", s: "#f0c49e", S: "#dca783", u: "#5a3418", m: "#a8505a", k: "#1d1d25", K: "#34343f", z: "#ffd34d", L: "#3b2716", b: "#7a5233", B: "#61401f", o: "#1a1a22" });
+], { y: "#b8955a", h: "#6b4a2b", s: "#f0c49e", S: "#dca783", u: "#5a3418", l: "#cfd9ea", m: "#a8505a", k: "#1d1d25", K: "#34343f", z: "#ffd34d", L: "#3b2716", b: "#7a5233", B: "#61401f", o: "#1a1a22" });
 const BOSS_IMG = { pater: PATER, vice: VICE, head: HEAD, phys: PHYS };
 const BOSS_OUT = {}; Object.keys(BOSS_IMG).forEach(k => BOSS_OUT[k] = outline(BOSS_IMG[k], "#e3e9f6"));
 
@@ -895,6 +1184,80 @@ if (/debug/.test(location.hash)) window.__bj = { WORLDS, get G() { return G; }, 
     checkInteractive();
   } };
 
+const WORLDS_ES = [
+ {
+  "name": "Humo, fuego y pergamino",
+  "era": "De la Antigüedad a la imprenta",
+  "enemyName": "Interferencias",
+  "station": "Pergamino",
+  "stationPl": "Pergaminos",
+  "intro": "Mucho antes de que existiera la electricidad, las personas tenían que enviar mensajes a grandes distancias: con señales de humo, antorchas, tambores, mensajeros y, más tarde, con libros impresos. Cada método necesitaba un emisor, un canal, un receptor… y un código común.",
+  "bossLine": "Lee los cuatro pergaminos. Al final te espera el padre, guardián de los libros, con tres preguntas.",
+  "boss": {
+   "title": "EL PADRE · GUARDIÁN DE LOS LIBROS",
+   "who": [
+    "El padre · guardián de los libros"
+   ],
+   "hello": "¡Hola, joven mensajero! Antes de que sigas con tu mensaje, tengo tres preguntas de mi libro para ti. ¡Escucha bien!",
+   "bye": "¡Muy bien hecho! Conoces la historia de los mensajes. Toma tu mensaje y sigue adelante: te espera la época de los cables y las chispas."
+  }
+ },
+ {
+  "name": "Cables y chispas",
+  "era": "Telégrafo, teléfono y radio",
+  "enemyName": "Chispas",
+  "station": "Telegrama",
+  "stationPl": "Telegramas",
+  "intro": "En el siglo XIX la luz se convirtió en electricidad: primero se movían brazos de señales en torres, luego sonaban los manipuladores Morse y, al final, los cables y las ondas de radio llevaron incluso la voz por todo el mundo. ¡Fíjate en las señales Morse que corren por los cables!",
+  "bossLine": "Recoge los cuatro telegramas. Al final te examina el subdirector, maestro de las líneas.",
+  "boss": {
+   "title": "EL SUBDIRECTOR · MAESTRO DE LAS LÍNEAS",
+   "who": [
+    "El subdirector"
+   ],
+   "hello": "¡Hola y bienvenido a la estación telegráfica! Aquí me encargo de las líneas… y de tres preguntas difíciles sobre Morse, teléfonos y radio. ¿Preparado?",
+   "bye": "¡Genial! Has mantenido la línea. A partir de ahora todo es digital: en el reino de los bits ya te espera la directora."
+  }
+ },
+ {
+  "name": "Bits y bytes",
+  "era": "Números binarios y ordenadores",
+  "enemyName": "Bugs",
+  "station": "Disquete",
+  "stationPl": "Disquetes",
+  "intro": "¡Bienvenido al interior del ordenador! Aquí solo hay dos estados: corriente sí o no, 1 o 0. En los disquetes te esperan tareas sobre el sistema binario; a veces tendrás que encender tú mismo los LED para formar un número binario. ¡Cuidado con los bugs!",
+  "bossLine": "Lee los cuatro disquetes. Al final te examina la directora, señora de los bits.",
+  "boss": {
+   "title": "LA DIRECTORA · SEÑORA DE LOS BITS",
+   "who": [
+    "La directora"
+   ],
+   "hello": "¡Qué bien que hayas llegado hasta aquí! En mi reino solo cuenta 0 o 1. Demuéstrame con tres tareas que dominas el sistema binario. ¡Tengo curiosidad!",
+   "bye": "¡Excelente, un sobresaliente! Ya solo falta el laberinto de puertas. Allí te espera el tribunal al completo."
+  }
+ },
+ {
+  "name": "Laberinto de puertas",
+  "era": "Funciones lógicas básicas",
+  "enemyName": "Glitches",
+  "station": "Esquema",
+  "stationPl": "Esquemas",
+  "intro": "Dentro del ordenador deciden diminutos interruptores: AND, OR, NOT. En los esquemas colocas las entradas E₁ y E₂ para que el LED de la salida A se encienda correctamente. Los glitches saltan, ¡ten cuidado!",
+  "bossLine": "Resuelve los cuatro esquemas. En la gran final, el tribunal te hará seis preguntas: tres de repaso de todos los mundos y tres de lógica.",
+  "boss": {
+   "title": "EL TRIBUNAL · LOS TRES GUARDIANES",
+   "who": [
+    "El padre",
+    "La directora",
+    "El subdirector"
+   ],
+   "hello": "¡El tribunal está completo! Cada uno de nosotros te hará dos preguntas: en la primera ronda repasamos todos los mundos, en la segunda toca la lógica. Si apruebas, tu mensaje llegará por fin a su destino.",
+   "bye": "¡Enhorabuena! Desde las señales de humo hasta las puertas lógicas: tu mensaje ha llegado. El tribunal está muy contento contigo."
+  }
+ }
+];
+WORLDS.forEach((w, i) => { const e = WORLDS_ES[i]; w.boss.es = e.boss; const x = Object.assign({}, e); delete x.boss; w.es = x; });
+
 // ======================================================================
 //  SOUND
 // ======================================================================
@@ -923,7 +1286,7 @@ let ctrl = store.get("bj_ctrl", "tap");
 const taps = new Set();
 function applyCtrl() {
   document.body.classList.toggle("classic", ctrl === "classic");
-  const t = "Steuerung: " + (ctrl === "tap" ? "Tippen" : "Tasten");
+  const t = ll("Steuerung: ", "Control: ") + (ctrl === "tap" ? ll("Tippen", "tocar") : ll("Tasten", "teclas"));
   ["bCtrl", "bCtrl2"].forEach(id => { $(id).textContent = t; });
 }
 function toggleCtrl() { ctrl = ctrl === "tap" ? "classic" : "tap"; store.set("bj_ctrl", ctrl); applyCtrl(); if (G) G.player.wait = ctrl === "tap"; }
@@ -985,8 +1348,8 @@ function buildWorldList() {
     const b = document.createElement("button"); b.type = "button";
     const open = i < unlocked();
     b.className = "world" + (open ? "" : " locked") + (i === chosenWorld ? " sel" : "");
-    const t = document.createElement("b"); t.textContent = "Welt " + w.n;
-    const s = document.createElement("span"); s.textContent = w.name + (open ? "" : " · gesperrt");
+    const t = document.createElement("b"); t.textContent = ll("Welt ", "Mundo ") + w.n;
+    const s = document.createElement("span"); s.textContent = LO(w).name + (open ? "" : ll(" · gesperrt", " · bloqueado"));
     b.append(t, s);
     b.disabled = !open;
     b.onclick = () => { chosenWorld = i; buildWorldList(); };
@@ -1001,6 +1364,51 @@ $("bPlay").onclick = () => { buildHeroList(); show("scrHero", true); };
 $("bHeroGo").onclick = () => { screenStack = []; newRun(); };
 $("bStart").onclick = () => { startWorld(); };
 $("bCtrl").onclick = toggleCtrl; $("bCtrl2").onclick = toggleCtrl; applyCtrl();
+// ---------- Feste Texte der Oberfläche: Deutsch steht im HTML, Spanisch hier ----------
+const UI_ES = [
+  ["#scrTitle .eyebrow", "Informática · 4.º de ESO"],
+  ["#scrTitle p", "El viaje del mensaje: lleva un mensaje importante a través de la historia, desde las señales de humo hasta las puertas lógicas. Resuelve las tareas, recoge bits y supera las preguntas de los guardianes de cada época."],
+  ["#bPlay", "Jugar"], ["#bScores", "Clasificación"], ["#bHelp", "Cómo se juega"],
+  ["#scrHelp .eyebrow", "Instrucciones"], ["#scrHelp h2", "Cómo se juega"],
+  ["#scrHelp ul.help", `<li><b>Control «tocar»</b> (por defecto): tu héroe corre solo. Toca en cualquier parte de la pantalla para saltar. Mantener pulsado = saltar más alto. Tocar otra vez en el aire = doble salto. En el ordenador también funcionan la <kbd>barra espaciadora</kbd> o un clic.</li>
+      <li><b>Control «teclas»</b>: correr con <kbd>←</kbd> <kbd>→</kbd> o <kbd>A</kbd> <kbd>D</kbd>, saltar con <kbd>espacio</kbd> o <kbd>↑</kbd>. En el móvil aparecen entonces flechas.</li>
+      <li>Tu héroe lleva un <b>lápiz</b>. Con el botón <b>GOLPE</b> (en el ordenador <kbd>X</kbd> o <kbd>Intro</kbd>) golpeas con él.</li>
+      <li>Recoge los <b>bits</b> (0 y 1). A los alborotadores, como interferencias, chispas, bugs y glitches, los eliminas con el lápiz o saltando encima.</li>
+      <li>En cada mundo hay cuatro tareas en el camino: pergaminos, telegramas, disquetes y esquemas. La puerta solo se abre cuando las cuatro están resueltas.</li>
+      <li>Detrás de la puerta esperan los guardianes del mundo. Acércate a ellos y te harán tres preguntas; en la gran final, incluso seis. Cada respuesta correcta da puntos y cada error cuesta un corazón.</li>
+      <li>En el mundo 3 enciendes LED para formar números binarios; en el mundo 4 colocas las entradas E₁ y E₂ de una puerta para que el LED de la salida A se encienda correctamente.</li>
+      <li>En el ordenador: responde con <kbd>1</kbd>–<kbd>4</kbd> y sigue con <kbd>Intro</kbd>.</li>`, true],
+  ["[data-back]", "Volver"],
+  ["#scrHero .eyebrow", "Paso 1"], ["#scrHero h2", "Elige a tu héroe"], ["#bHeroGo", "Continuar"],
+  ["#bStart", "¡Vamos!"], ["#qCheck", "Comprobar"], ["#qNext", "Continuar"], ["#talkGo", "Continuar"],
+  ["#scrPause h2", "Pausa"], ["#bResume", "Seguir jugando"], ["#bRestart", "Reiniciar mundo"], ["#bToTitle", "Al menú"],
+  ["label[for=nameIn]", "Tu nombre para la clasificación"], ["#bSave", "Apuntarme"], ["#bStop", "Parar y apuntarme"], ["#bAgain", "Otra vez"], ["#bEndTitle", "Al menú"],
+  ["#scrScores .eyebrow", "Salón de la fama"], ["#scrScores h2", "Clasificación"],
+  ["#scrScores th", ["#", "Nombre", "Héroe", "Mundo", "Puntos"]],
+  ["#tapHint", `<b>Toca</b> = saltar<br>toca otra vez = <b>doble salto</b><br><b>GOLPE</b> = lápiz<br><span style="opacity:.7">Pon el móvil en horizontal para verlo más grande</span>`, true],
+  ["#atkBtn span", "GOLPE"]
+];
+const UI_DE = UI_ES.map(([sel, , html]) => [sel, [...document.querySelectorAll(sel)].map(el => html ? el.innerHTML : el.textContent), html]);
+function applyLang() {
+  document.documentElement.lang = LANG;
+  UI_ES.forEach(([sel, es, html], i) => {
+    const de = UI_DE[i][1];
+    document.querySelectorAll(sel).forEach((el, j) => {
+      const v = LANG === "es" ? (Array.isArray(es) ? es[j] : es) : de[j];
+      if (html) el.innerHTML = v; else el.textContent = v;
+    });
+  });
+  $("nameIn").placeholder = ll("z. B. Lena 10b", "p. ej. Lucía 4.º B");
+  $("atkBtn").setAttribute("aria-label", ll("Bleistift-Hieb", "Golpe con el lápiz"));
+  $("bLangDe").classList.toggle("on", LANG === "de"); $("bLangEs").classList.toggle("on", LANG === "es");
+  $("bLangDe").setAttribute("aria-pressed", LANG === "de"); $("bLangEs").setAttribute("aria-pressed", LANG === "es");
+  applyCtrl(); buildWorldList();
+}
+function setLang(l) { LANG = l; store.set("bj_lang", l); applyLang(); }
+$("bLangDe").onclick = () => setLang("de");
+$("bLangEs").onclick = () => setLang("es");
+applyLang();
+
 $("muteBtn").onclick = () => { muted = !muted; store.set("bj_muted", muted); $("muteBtn").style.opacity = muted ? .45 : 1; if (!muted) sfx("coin"); };
 $("muteBtn").style.opacity = muted ? .45 : 1;
 $("pauseBtn").onclick = () => { if (mode === "play" && !anyScreenOpen()) openPause(); };
@@ -1019,8 +1427,8 @@ function buildHeroList() {
     const c = document.createElement("canvas"); c.width = 12; c.height = 16;
     const g = c.getContext("2d"); g.imageSmoothingEnabled = false; g.drawImage(h.frames[0], 0, 0);
     const n = document.createElement("b"); n.textContent = h.name;
-    const p = document.createElement("span"); p.className = "perk"; p.textContent = h.perk;
-    const d = document.createElement("small"); d.textContent = h.desc;
+    const p = document.createElement("span"); p.className = "perk"; p.textContent = LO(h).perk;
+    const d = document.createElement("small"); d.textContent = LO(h).desc;
     b.append(c, n, p, d);
     b.onclick = () => { chosenHero = h; list.querySelectorAll(".hero").forEach(x => x.classList.remove("sel")); b.classList.add("sel"); $("bHeroGo").disabled = false; };
     list.append(b);
@@ -1038,9 +1446,9 @@ function newRun() {
 }
 function showIntro() {
   mode = "intro";
-  const w = WORLDS[G.worldIdx];
+  const w = locW(WORLDS[G.worldIdx]);
   G.world = w;
-  $("introTag").textContent = `Welt ${w.n} · ${w.era}`;
+  $("introTag").textContent = `${ll("Welt", "Mundo")} ${w.n} · ${w.era}`;
   $("introTitle").textContent = w.name;
   $("introText").textContent = w.intro;
   $("introBoss").textContent = w.bossLine;
@@ -1049,7 +1457,7 @@ function showIntro() {
 }
 
 function startWorld() {
-  const w = WORLDS[G.worldIdx];
+  const w = locW(WORLDS[G.worldIdx]);
   Object.assign(G, {
     world: w, hearts: G.maxHearts, jokers: G.hero.jokers, worldStartScore: G.score,
     w: { bits: 0, stomps: 0, correct: 0, ansPts: 0, time: 0, superOk: 0 },
@@ -1063,7 +1471,7 @@ function startWorld() {
   buildLevel(w);
   releaseKeys(); screenStack = []; hideAll();
   mode = "play";
-  toast(ctrl === "tap" ? "Tippe zum Loslaufen!" : `Welt ${w.n}: ${w.name}`);
+  toast(ctrl === "tap" ? ll("Tippe zum Loslaufen!", "¡Toca para empezar a correr!") : `${ll("Welt", "Mundo")} ${w.n}: ${w.name}`);
   if (/^#boss/.test(location.hash)) { // Lehrkraft-Test: direkt zum Endgegner
     G.stations.forEach(s => { s.done = true; s.ok = true; }); G.stationsDone = 4; openGate(); G.player.x = 88 * T; G.cam = COLS * T - W;
   }
@@ -1201,7 +1609,7 @@ function update(dt) {
     s.done = true;
     G.checkpoint = { x: s.x + 6, y: 13 * T - 44 };
     const q = nextQ();
-    ask(q, `${G.world.station} ${s.n} von 4`).then(ok => {
+    ask(q, `${G.world.station} ${s.n} ${ll("von", "de")} 4`).then(ok => {
       if (!G || G.over) return;
       s.ok = ok;
       if (ok) { G.score += 100; G.w.correct++; G.w.ansPts += 100; } else loseHeartQuiet();
@@ -1214,7 +1622,7 @@ function update(dt) {
   // Tor
   G.gateShut += (G.gateTarget - G.gateShut) * Math.min(1, dt * 2.5);
   G.gateHint -= dt;
-  if (!G.gateOpen && !G.bossActive && p.x > 84 * T && G.gateHint <= 0) { toast(`Erst alle ${G.world.stationPl} lösen (${G.stationsDone}/4)`); G.gateHint = 4; }
+  if (!G.gateOpen && !G.bossActive && p.x > 84 * T && G.gateHint <= 0) { toast(ll(`Erst alle ${G.world.stationPl} lösen (${G.stationsDone}/4)`, `Primero resuelve todos los ${G.world.stationPl.toLowerCase()} (${G.stationsDone}/4)`)); G.gateHint = 4; }
   if (G.gateOpen && !G.bossActive && p.x > 90 * T) startBoss();
 
   if (G.bossActive && G.boss) updateBoss(dt);
@@ -1247,17 +1655,25 @@ function loseHeartQuiet() { G.hearts--; sfx("hurt"); G.player.inv = 1; if (G.hea
 function openGate() {
   G.gateOpen = true; G.gateTarget = 0;
   for (let y = 3; y <= 12; y++) G.grid[y][87] = 0;
-  sfx("gate"); toast(`Alle ${G.world.stationPl} gelöst – das Tor öffnet sich!`);
+  sfx("gate"); toast(ll(`Alle ${G.world.stationPl} gelöst – das Tor öffnet sich!`, `¡${G.world.stationPl} resueltos: la puerta se abre!`));
 }
 
 // ======================================================================
 //  ENDGEGNER: drei Fragen
 // ======================================================================
 const BOSS_HOME = 104 * T, GROUND_B = 13 * T - 96;
+const BOSS_SHOUT_ES = { pater: "¡Alto! ¿Quién entra en mi biblioteca?", vice: "¡Un momento! Aquí solo se pasa con examen.", head: "¡Ah, visita en mi reino de los bits!", phys: "¡No tan deprisa!" };
+const BOSS_CALL_ES = { pater: ["¡Acércate, joven mensajero!", "Sin miedo, ¡ven aquí!"], vice: ["¡Venga, acércate!", "¡Aquí, que no muerdo!"],
+  head: ["¡Ven aquí conmigo!", "¿A qué esperas? ¡Ven!"], phys: ["¡Ven, tenemos que hablar!", "¡Venga, a la pizarra!"] };
+const shout = k => ll(BOSS_SHOUT[k], BOSS_SHOUT_ES[k]);
+const callLine = k => pick(ll(BOSS_CALL[k], BOSS_CALL_ES[k]));
 const BOSS_SHOUT = { pater: "Halt! Wer betritt meine Bibliothek?", vice: "Moment mal! Hier geht's nur mit Prüfung weiter!", head: "Ah – Besuch in meinem Reich der Bits!", phys: "Nicht so schnell!" };
 const PHYS_CFG = { members: ["phys"], drop: true, super: true, label: "SUPERENDGEGNER", title: "DER PHYSIKLEHRER · HERR DER SCHALTUNGEN", who: ["Der Physiklehrer"],
   hello: "Bestanden? Nicht so schnell! Ein Physiklehrer will nicht nur wissen, ob die LED leuchtet – sondern warum. Ich habe drei schwere Fragen zu Verknüpfungen für dich. Falsche Antworten kosten hier kein Herz, aber jede richtige bringt viele Punkte.",
-  bye: "Donnerwetter! Du verknüpfst Gatter wie ein Profi. Deine Nachricht ist angekommen – und du darfst dich ab heute echter Bit-Jäger nennen!" };
+  bye: "Donnerwetter! Du verknüpfst Gatter wie ein Profi. Deine Nachricht ist angekommen – und du darfst dich ab heute echter Bit-Jäger nennen!",
+  es: { label: "SÚPER JEFE FINAL", title: "EL PROFESOR DE FÍSICA · SEÑOR DE LOS CIRCUITOS", who: ["El profesor de física"],
+    hello: "¿Aprobado? ¡No tan deprisa! Un profesor de física no solo quiere saber si el LED se enciende, sino por qué. Tengo tres preguntas difíciles sobre combinaciones de puertas. Aquí las respuestas falsas no cuestan corazones, pero cada respuesta correcta da muchos puntos.",
+    bye: "¡Rayos y truenos! Combinas puertas como un profesional. Tu mensaje ha llegado y desde hoy eres un auténtico cazador de bits." } };
 const BOSS_CALL = {
   pater: ["Komm ruhig näher, junger Bote!", "Nur keine Scheu – komm her!"],
   vice: ["Na komm, trau dich ran!", "Hierher, ich beiß nicht!"],
@@ -1287,15 +1703,15 @@ function superBoss() {
   const b = G.boss;
   b.state = "exit"; b.t = 0;
   G.stormTarget = 1; G.flashT = .7; G.shake = .5; thunder(0);
-  const lines = ["Oh oh … hört ihr das?", "Ein Gewitter?!", "Schnell weg hier!"];
+  const lines = ll(["Oh oh … hört ihr das?", "Ein Gewitter?!", "Schnell weg hier!"], ["Oh, oh… ¿lo oís?", "¿Una tormenta?", "¡Rápido, fuera de aquí!"]);
   b.members.forEach((m, i) => { m.vy = -200; say(m, lines[i % lines.length], 2); });
-  setTimeout(() => { if (G && !G.over) startBoss(PHYS_CFG); }, 2900);
+  setTimeout(() => { if (G && !G.over) startBoss(LO(PHYS_CFG)); }, 2900);
 }
 async function bossQuiz() {
   const cfg = G.bcfg, b = G.boss;
   const lead = b.members.length > 1 ? 1 : 0;
   b.state = "talk";
-  await talk(cfg.who[lead], cfg.hello, "Ich bin bereit", cfg.members[lead]);
+  await talk(cfg.who[lead], cfg.hello, ll("Ich bin bereit", "Estoy listo"), cfg.members[lead]);
   let qs, askers;
   if (cfg.super) {
     qs = [pick(SQ_COMBO)].concat(shuffle(SQ).slice(0, 2));
@@ -1311,33 +1727,33 @@ async function bossQuiz() {
     qs = shuffle((inter.length ? [inter[0]] : []).concat(mc).slice(0, 3));
     askers = [0, 0, 0];
   }
-  const praise = ["Sehr gut!", "Richtig, weiter so!", "Ausgezeichnet!", "Stark!", "Genau so!", "Hervorragend!"];
+  const praise = ll(["Sehr gut!", "Richtig, weiter so!", "Ausgezeichnet!", "Stark!", "Genau so!", "Hervorragend!"], ["¡Muy bien!", "¡Correcto, sigue así!", "¡Excelente!", "¡Genial!", "¡Exacto!", "¡Estupendo!"]);
   for (let i = 0; i < qs.length; i++) {
     if (!G || G.over) return;
-    if (cfg.final && i === 3) { say(b.members[1], "Zweite Runde: jetzt wird's logisch!", 1.8); await new Promise(r => setTimeout(r, 1500)); if (!G || G.over) return; }
+    if (cfg.final && i === 3) { say(b.members[1], ll("Zweite Runde: jetzt wird's logisch!", "Segunda ronda: ¡ahora toca lógica!"), 1.8); await new Promise(r => setTimeout(r, 1500)); if (!G || G.over) return; }
     b.active = askers[i];
     const m = b.members[b.active];
     b.state = "ask";
-    const ok = await ask(qs[i], `${cfg.who[b.active]} · ${cfg.super ? "Superfrage" : "Frage"} ${i + 1} von ${qs.length}`);
+    const ok = await ask(qs[i], `${cfg.who[b.active]} · ${cfg.super ? ll("Superfrage", "Superpregunta") : ll("Frage", "Pregunta")} ${i + 1} ${ll("von", "de")} ${qs.length}`);
     if (!G || G.over) return;
     b.hp--;
     if (cfg.super) {
-      if (ok) { G.w.superOk++; G.score += 250; m.flash = .5; m.vy = -260; say(m, ["Donnerwetter!", "Elektrisierend gut!", "Volle Spannung – richtig!"][i], 1.6); G.flashT = .25; }
-      else { say(m, "Hm, da fehlt noch Spannung.", 1.6); sfx("wrong"); }
+      if (ok) { G.w.superOk++; G.score += 250; m.flash = .5; m.vy = -260; say(m, ll(["Donnerwetter!", "Elektrisierend gut!", "Volle Spannung – richtig!"], ["¡Rayos y truenos!", "¡Electrizante!", "¡Máxima tensión… correcto!"])[i], 1.6); G.flashT = .25; }
+      else { say(m, ll("Hm, da fehlt noch Spannung.", "Mmm, aquí falta tensión."), 1.6); sfx("wrong"); }
     } else if (ok) { G.w.correct++; G.score += 150; G.w.ansPts += 150; m.flash = .5; m.vy = -260; say(m, praise[i % praise.length], 1.4); }
-    else { say(m, "Hmm … das solltest du nachlesen.", 1.6); loseHeartQuiet(); if (G.over) return; }
+    else { say(m, ll("Hmm … das solltest du nachlesen.", "Mmm… eso deberías repasarlo."), 1.6); loseHeartQuiet(); if (G.over) return; }
     b.state = "idle";
     await new Promise(r => setTimeout(r, 1300));
   }
   if (!G || G.over || G.won) return;
   b.state = "done"; b.t = 0; sfx("win");
-  b.members.forEach(m => say(m, cfg.super ? (G.w.superOk === 3 ? "Alle drei richtig – Respekt!" : "Gut gekämpft!") : "Bestanden!", 2.4));
+  b.members.forEach(m => say(m, cfg.super ? (G.w.superOk === 3 ? ll("Alle drei richtig – Respekt!", "¡Las tres bien, enhorabuena!") : ll("Gut gekämpft!", "¡Buen combate!")) : ll("Bestanden!", "¡Aprobado!"), 2.4));
   if (cfg.final) { G.w.superOk = 0; setTimeout(() => { if (G && !G.over) superBoss(); }, 2400); return; }
   G.won = true;
   if (cfg.super) G.stormTarget = 0;
   setTimeout(async () => {
     if (!G) return;
-    await talk(cfg.who[lead], cfg.bye, "Zur Auswertung", cfg.members[lead]);
+    await talk(cfg.who[lead], cfg.bye, ll("Zur Auswertung", "Ver resultados"), cfg.members[lead]);
     worldWon();
   }, 2200);
 }
@@ -1399,7 +1815,7 @@ function updateBoss(dt) {
         if (m.drop && !m.arrived) {
           m.arrived = true; m.flash = .9; G.shake = .6; G.flashT = .6; thunder(0); sfx("stomp");
           for (let k = 0; k < 30; k++) G.parts.push({ x: m.x + 28, y: 13 * T - 6, vx: (Math.random() - .5) * 520, vy: -Math.random() * 300, life: .8, max: .8, r: 3, color: k % 2 ? "#ffe066" : "#9fd8ff", g: 500 });
-          say(m, BOSS_SHOUT[m.k], 2.4);
+          say(m, shout(m.k), 2.4);
         }
       }
     }
@@ -1419,7 +1835,7 @@ function updateBoss(dt) {
       if (m.x <= m.tx) {
         m.x = m.tx; m.arrived = true; m.walking = false; m.flash = .7; m.vy = -420; G.shake = .3; sfx("stomp");
         for (let k = 0; k < 16; k++) G.parts.push({ x: m.x + 28, y: 13 * T - 6, vx: (Math.random() - .5) * 340, vy: -Math.random() * 160, life: .6, max: .6, r: 3, color: "#e9edf6", g: 400 });
-        if (b.members.length === 1 || i === 1) say(m, b.members.length === 1 ? BOSS_SHOUT[m.k] : "Die Prüfungskommission tagt!", 2.4);
+        if (b.members.length === 1 || i === 1) say(m, b.members.length === 1 ? shout(m.k) : ll("Die Prüfungskommission tagt!", "¡El tribunal está reunido!"), 2.4);
       }
     });
     if (b.members.every(m => m.arrived) && b.t > b.members[b.members.length - 1].delay + (b.members[0].drop ? 2.6 : 3.4)) {
@@ -1428,7 +1844,7 @@ function updateBoss(dt) {
     }
   } else if (b.state === "call") {
     b.callT -= dt;
-    if (b.callT <= 0) { const m = b.members[b.caller]; say(m, b.members.length > 1 ? "Tritt vor die Kommission!" : pick(BOSS_CALL[m.k]), 2.2); b.callT = 3.2; b.caller = b.members.length > 1 ? (b.caller + 1) % b.members.length : 0; }
+    if (b.callT <= 0) { const m = b.members[b.caller]; say(m, b.members.length > 1 ? ll("Tritt vor die Kommission!", "¡Preséntate ante el tribunal!") : callLine(m.k), 2.2); b.callT = 3.2; b.caller = b.members.length > 1 ? (b.caller + 1) % b.members.length : 0; }
     const stop = Math.min(...b.members.map(m => m.x)) - 3 * T;
     if (p.x + p.w >= stop && p.onGround) { b.state = "greet"; p.vx = 0; b.members.forEach(m => m.say = ""); bossQuiz(); }
   } else if (b.state === "done") {
@@ -1453,7 +1869,7 @@ function gateSVG(gate, e1, e2, aState, interactive) {
   const ys = one ? [75] : [45, 105];
   const vals = one ? [e1] : [e1, e2];
   const navy = "#14285e";
-  let s = `<svg viewBox="0 0 360 150" role="img" aria-label="${gate}-Gatter mit Eingängen und LED am Ausgang A">`;
+  let s = `<svg viewBox="0 0 360 150" role="img" aria-label="${gn(gate)}">`;
   ys.forEach((y, i) => {
     const on = vals[i] === 1;
     s += `<line x1="70" y1="${y}" x2="140" y2="${y}" stroke="${on ? "#d4483c" : navy}" stroke-width="3"/>`;
@@ -1463,7 +1879,7 @@ function gateSVG(gate, e1, e2, aState, interactive) {
   });
   s += `<rect x="140" y="22" width="80" height="106" fill="#ffffff" stroke="${navy}" stroke-width="3"/>`;
   s += `<text x="180" y="62" text-anchor="middle" font-family="Pixelify Sans, monospace" font-size="26" font-weight="700" fill="${navy}">${GATE_SYM[gate]}</text>`;
-  s += `<text x="180" y="116" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-size="12" fill="#4d5a7a">${gate}</text>`;
+  s += `<text x="180" y="116" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-size="12" fill="#4d5a7a">${gn(gate)}</text>`;
   const ox = neg ? 232 : 220;
   if (neg) s += `<circle cx="226" cy="75" r="6" fill="#ffffff" stroke="${navy}" stroke-width="3"/>`;
   const lit = aState === 1;
@@ -1480,22 +1896,22 @@ function gateSVG(gate, e1, e2, aState, interactive) {
 function comboSVG(q, e, aState, interactive) {
   const navy = "#14285e", neg = g => g === "NAND" || g === "NOR";
   const X = GATE_FN[q.g1](e[0], e[1]);
-  let s = `<svg viewBox="0 0 420 190" role="img" aria-label="Verknüpfung aus ${q.g1} und ${q.g2} mit LED am Ausgang A">`;
+  let s = `<svg viewBox="0 0 420 190" role="img" aria-label="${gn(q.g1)} – ${gn(q.g2)}">`;
   const sw = (i, y, fixed) => {
     const on = e[i] === 1;
     s += `<line x1="72" y1="${y}" x2="${i < 2 ? 112 : 252}" y2="${y}" stroke="${on ? "#d4483c" : navy}" stroke-width="3"/>`;
     s += `<g class="${fixed ? "" : "sw"}" data-i="${i}" ${interactive && !fixed ? 'tabindex="0" role="button"' : ""} aria-label="Eingang E${i + 1} = ${e[i]}${fixed ? " (fest)" : ""}">`;
     s += `<rect x="6" y="${y - 18}" width="66" height="36" rx="6" fill="${fixed ? "#d7dce8" : on ? navy : "#ffffff"}" stroke="${navy}" stroke-width="2.5" ${fixed ? 'stroke-dasharray="4 3"' : ""}/>`;
     s += `<text x="39" y="${y + 6}" text-anchor="middle" font-family="Pixelify Sans, monospace" font-size="16" font-weight="700" fill="${on && !fixed ? "#ffffff" : navy}">E${"₁₂₃"[i]} = ${e[i]}</text></g>`;
-    if (fixed) s += `<text x="39" y="${y + 32}" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-size="11" fill="#4d5a7a">fest</text>`;
+    if (fixed) s += `<text x="39" y="${y + 32}" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-size="11" fill="#4d5a7a">${ll("fest", "fijo")}</text>`;
   };
   // Gatter 1
   s += `<line x1="${neg(q.g1) ? 180 : 172}" y1="60" x2="212" y2="60" stroke="${X ? "#d4483c" : navy}" stroke-width="3"/><line x1="212" y1="60" x2="212" y2="100" stroke="${X ? "#d4483c" : navy}" stroke-width="3"/><line x1="212" y1="100" x2="252" y2="100" stroke="${X ? "#d4483c" : navy}" stroke-width="3"/>`;
   sw(0, 38, false); sw(1, 82, false); sw(2, 148, true);
-  s += `<rect x="112" y="20" width="60" height="80" fill="#fff" stroke="${navy}" stroke-width="3"/><text x="142" y="56" text-anchor="middle" font-family="Pixelify Sans, monospace" font-size="22" font-weight="700" fill="${navy}">${GATE_SYM[q.g1]}</text><text x="142" y="88" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-size="11" fill="#4d5a7a">${q.g1}</text>`;
+  s += `<rect x="112" y="20" width="60" height="80" fill="#fff" stroke="${navy}" stroke-width="3"/><text x="142" y="56" text-anchor="middle" font-family="Pixelify Sans, monospace" font-size="22" font-weight="700" fill="${navy}">${GATE_SYM[q.g1]}</text><text x="142" y="88" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-size="11" fill="#4d5a7a">${gn(q.g1)}</text>`;
   if (neg(q.g1)) s += `<circle cx="176" cy="60" r="5" fill="#fff" stroke="${navy}" stroke-width="2.5"/>`;
   // Gatter 2
-  s += `<rect x="252" y="80" width="60" height="90" fill="#fff" stroke="${navy}" stroke-width="3"/><text x="282" y="122" text-anchor="middle" font-family="Pixelify Sans, monospace" font-size="22" font-weight="700" fill="${navy}">${GATE_SYM[q.g2]}</text><text x="282" y="158" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-size="11" fill="#4d5a7a">${q.g2}</text>`;
+  s += `<rect x="252" y="80" width="60" height="90" fill="#fff" stroke="${navy}" stroke-width="3"/><text x="282" y="122" text-anchor="middle" font-family="Pixelify Sans, monospace" font-size="22" font-weight="700" fill="${navy}">${GATE_SYM[q.g2]}</text><text x="282" y="158" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-size="11" fill="#4d5a7a">${gn(q.g2)}</text>`;
   if (neg(q.g2)) s += `<circle cx="316" cy="124" r="5" fill="#fff" stroke="${navy}" stroke-width="2.5"/>`;
   const lit = aState === 1;
   s += `<line x1="${neg(q.g2) ? 321 : 312}" y1="124" x2="362" y2="124" stroke="${lit ? "#d4483c" : navy}" stroke-width="3"/>`;
@@ -1509,17 +1925,17 @@ function comboSVG(q, e, aState, interactive) {
 const comboA = (q, e) => GATE_FN[q.g2](GATE_FN[q.g1](e[0], e[1]), e[2]);
 function prepQ(q) {
   if (q.type === "combo") {
-    const word = q.want ? "leuchtet" : "aus ist";
-    return { ...q, q: `Verknüpfung: A = (E₁ ${q.g1} E₂) ${q.g2} E₃. E₃ ist fest auf ${q.e3}. Lege E₁ und E₂ so, dass die LED A ${word}.` };
+    return { ...q, q: ll(`Verknüpfung: A = (E₁ ${gn(q.g1)} E₂) ${gn(q.g2)} E₃. E₃ ist fest auf ${q.e3}. Lege E₁ und E₂ so, dass die LED A ${q.want ? "leuchtet" : "aus ist"}.`,
+      `Combinación: A = (E₁ ${gn(q.g1)} E₂) ${gn(q.g2)} E₃. E₃ está fijo en ${q.e3}. Coloca E₁ y E₂ para que el LED A ${q.want ? "se encienda" : "esté apagado"}.`) };
   }
   if (q.type === "bits") {
     const max = 2 ** q.n - 1;
     let t; do { t = 3 + Math.floor(Math.random() * (max - 2)); } while (q.n === 8 && t < 20);
-    return { ...q, target: t, q: `Schalte die LEDs so, dass die Dualzahl den Wert ${t} hat.` };
+    return { ...q, target: t, q: ll(`Schalte die LEDs so, dass die Dualzahl den Wert ${t} hat.`, `Enciende los LED para que el número binario tenga el valor ${t}.`) };
   }
   if (q.type === "gate") {
-    const word = q.want ? "leuchtet" : "aus ist";
-    return { ...q, q: `${q.gate}-Gatter: Lege die Eingänge so, dass die LED am Ausgang A ${word}.` };
+    return { ...q, q: ll(`${gn(q.gate)}-Gatter: Lege die Eingänge so, dass die LED am Ausgang A ${q.want ? "leuchtet" : "aus ist"}.`,
+      `Puerta ${gn(q.gate)}: coloca las entradas para que el LED de la salida A ${q.want ? "se encienda" : "esté apagado"}.`) };
   }
   return q;
 }
@@ -1527,7 +1943,7 @@ function prepQ(q) {
 function ask(q0, tag) {
   return new Promise(res => {
     releaseKeys(); G.paused = true;
-    const q = prepQ(q0);
+    const q = prepQ(LO(q0));
     qState = { res, q, answered: false, ok: false, openAt: performance.now(), answerAt: 0 };
     $("qTag").textContent = tag; $("qText").textContent = q.q;
     const box = $("qOpts"), extra = $("qExtra"); box.textContent = ""; extra.textContent = "";
@@ -1549,7 +1965,7 @@ function ask(q0, tag) {
       for (let i = 0; i < q.n; i++) {
         const pv = 2 ** (q.n - 1 - i);
         const b = document.createElement("button"); b.type = "button"; b.className = "bit";
-        b.setAttribute("aria-label", `Stelle mit Wert ${pv}`);
+        b.setAttribute("aria-label", `${ll("Stelle mit Wert", "Posición con valor")} ${pv}`);
         b.innerHTML = `<span class="led"></span><span class="d">0</span><span class="pv">${pv}</span>`;
         b.onclick = () => { if (qState.answered) return; qState.bits[i] ^= 1; b.classList.toggle("on", !!qState.bits[i]); b.querySelector(".d").textContent = qState.bits[i]; sfx("click"); };
         row.append(b);
@@ -1597,7 +2013,7 @@ function ask(q0, tag) {
         box.append(b);
       });
       if (G.jokers > 0 && opts.length > 2) {
-        jk.hidden = false; jk.textContent = `Funk-Tipp (${G.jokers})`;
+        jk.hidden = false; jk.textContent = `${ll("Funk-Tipp", "Pista por radio")} (${G.jokers})`;
         jk.onclick = () => {
           if (G.jokers <= 0 || qState.answered) return;
           G.jokers--; jk.hidden = true;
@@ -1617,7 +2033,7 @@ function ask(q0, tag) {
 function feedback(ok, text) {
   sfx(ok ? "right" : "wrong");
   const fb = $("qFb"); fb.hidden = false; fb.className = "feedback" + (ok ? "" : " bad"); fb.textContent = "";
-  const h = document.createElement("b"); h.textContent = ok ? "Richtig! " : "Leider falsch. ";
+  const h = document.createElement("b"); h.textContent = ok ? ll("Richtig! ", "¡Correcto! ") : ll("Leider falsch. ", "Lo siento, incorrecto. ");
   const s = document.createElement("span"); s.textContent = text;
   fb.append(h, s);
   $("qJoker").hidden = true; $("qCheck").hidden = true;
@@ -1645,19 +2061,21 @@ function checkInteractive() {
     const btns = $("qOpts").querySelectorAll(".bit");
     btns.forEach((b, i) => { b.disabled = true; if (!ok && want[i] === "1") b.classList.add("sol"); });
     const expl = `${want}${SUB(2)} = ${parts.join(" + ")} = ${q.target}.`;
-    feedback(ok, ok ? expl : `Du hast ${qState.bits.join("")}${SUB(2)} = ${val} eingestellt. Richtig wäre ${expl} Die grün umrandeten Stellen gehören eingeschaltet.`);
+    feedback(ok, ok ? expl : ll(`Du hast ${qState.bits.join("")}${SUB(2)} = ${val} eingestellt. Richtig wäre ${expl} Die grün umrandeten Stellen gehören eingeschaltet.`,
+      `Has puesto ${qState.bits.join("")}${SUB(2)} = ${val}. Lo correcto sería ${expl} Las posiciones marcadas en verde deben estar encendidas.`));
   } else if (q.type === "combo") {
     const [a, b, c] = qState.inp, X = GATE_FN[q.g1](a, b), A = comboA(q, qState.inp);
     const ok = A === q.want; qState.ok = ok;
     qState.draw();
-    feedback(ok, `Zwischenergebnis: E₁ ${q.g1} E₂ = ${a} ${q.g1} ${b} = ${X}. Dann ${X} ${q.g2} E₃ = ${X} ${q.g2} ${c} = ${A}.`);
+    feedback(ok, ll(`Zwischenergebnis: E₁ ${gn(q.g1)} E₂ = ${a} ${gn(q.g1)} ${b} = ${X}. Dann ${X} ${gn(q.g2)} E₃ = ${X} ${gn(q.g2)} ${c} = ${A}.`,
+      `Resultado intermedio: E₁ ${gn(q.g1)} E₂ = ${a} ${gn(q.g1)} ${b} = ${X}. Después, ${X} ${gn(q.g2)} E₃ = ${X} ${gn(q.g2)} ${c} = ${A}.`));
   } else {
     const [a, b] = qState.inp;
     const A = GATE_FN[q.gate](a, b);
     const ok = A === q.want; qState.ok = ok;
     qState.draw();
-    const rule = { UND: "UND: A = 1 nur, wenn E₁ = 1 und E₂ = 1.", ODER: "ODER: A = 1, sobald mindestens ein Eingang 1 ist. A = 0 nur bei E₁ = 0 und E₂ = 0.", NICHT: "NICHT: A ist immer das Gegenteil von E₁.", NAND: "NAND: A = 0 nur bei E₁ = 1 und E₂ = 1, sonst immer 1.", NOR: "NOR: A = 1 nur bei E₁ = 0 und E₂ = 0, sonst immer 0." }[q.gate];
-    const now = q.gate === "NICHT" ? `Bei E₁ = ${a} ist A = ${A}.` : `Bei E₁ = ${a} und E₂ = ${b} ist A = ${A}.`;
+    const rule = LANG === "es" ? { UND: "AND: A = 1 solo si E₁ = 1 y E₂ = 1.", ODER: "OR: A = 1 en cuanto al menos una entrada es 1. A = 0 solo con E₁ = 0 y E₂ = 0.", NICHT: "NOT: A es siempre lo contrario de E₁.", NAND: "NAND: A = 0 solo con E₁ = 1 y E₂ = 1; si no, siempre 1.", NOR: "NOR: A = 1 solo con E₁ = 0 y E₂ = 0; si no, siempre 0." }[q.gate] : { UND: "UND: A = 1 nur, wenn E₁ = 1 und E₂ = 1.", ODER: "ODER: A = 1, sobald mindestens ein Eingang 1 ist. A = 0 nur bei E₁ = 0 und E₂ = 0.", NICHT: "NICHT: A ist immer das Gegenteil von E₁.", NAND: "NAND: A = 0 nur bei E₁ = 1 und E₂ = 1, sonst immer 1.", NOR: "NOR: A = 1 nur bei E₁ = 0 und E₂ = 0, sonst immer 0." }[q.gate];
+    const now = q.gate === "NICHT" ? ll(`Bei E₁ = ${a} ist A = ${A}.`, `Con E₁ = ${a}, A = ${A}.`) : ll(`Bei E₁ = ${a} und E₂ = ${b} ist A = ${A}.`, `Con E₁ = ${a} y E₂ = ${b}, A = ${A}.`);
     feedback(ok, `${now} ${rule}`);
   }
 }
@@ -1681,18 +2099,18 @@ let lastEntry = null;
 function tallyRows(rows, total) {
   const tl = $("endTally"); tl.textContent = "";
   rows.forEach(([a, b]) => { const x = document.createElement("span"); x.textContent = a; const y = document.createElement("span"); y.textContent = b; tl.append(x, y); });
-  const x = document.createElement("span"); x.className = "sum"; x.textContent = "Gesamtpunktzahl";
+  const x = document.createElement("span"); x.className = "sum"; x.textContent = ll("Gesamtpunktzahl", "Puntuación total");
   const y = document.createElement("span"); y.className = "sum"; y.textContent = total; tl.append(x, y);
 }
 function worldRows(won) {
   const w = G.w, m = Math.floor(w.time / 60), s = String(Math.floor(w.time % 60)).padStart(2, "0");
   const rows = [
-    [`Bits gesammelt (${w.bits})`, w.bits * 10],
-    [`${G.world.enemyName} erledigt (${w.stomps})`, w.stomps * 50],
-    [`Richtige Antworten (${w.correct})`, w.ansPts]
+    [`${ll("Bits gesammelt", "Bits recogidos")} (${w.bits})`, w.bits * 10],
+    [ll(`${G.world.enemyName} erledigt (${w.stomps})`, `Enemigos eliminados (${w.stomps})`), w.stomps * 50],
+    [`${ll("Richtige Antworten", "Respuestas correctas")} (${w.correct})`, w.ansPts]
   ];
-  if (won && G.world.boss.final) rows.push([`Physiklehrer (${w.superOk} von 3 richtig)`, w.superOk * 250 + (w.superOk === 3 ? 500 : 0)]);
-  if (won) rows.push(["Welt geschafft", w.bonus], [`Zeitbonus (${m}:${s} min)`, w.timeBonus], [`Übrige Herzen (${G.hearts})`, w.heartBonus]);
+  if (won && G.world.boss.final) rows.push([ll(`Physiklehrer (${w.superOk} von 3 richtig)`, `Profesor de física (${w.superOk} de 3 correctas)`), w.superOk * 250 + (w.superOk === 3 ? 500 : 0)]);
+  if (won) rows.push([ll("Welt geschafft", "Mundo superado"), w.bonus], [`${ll("Zeitbonus", "Bonus de tiempo")} (${m}:${s} min)`, w.timeBonus], [`${ll("Übrige Herzen", "Corazones restantes")} (${G.hearts})`, w.heartBonus]);
   return rows;
 }
 function worldWon() {
@@ -1703,14 +2121,16 @@ function worldWon() {
   G.score += w.bonus + w.timeBonus + w.heartBonus;
   const last = G.worldIdx === WORLDS.length - 1;
   store.set("bj_unlocked", Math.max(unlocked(), Math.min(4, G.worldIdx + 2)));
-  $("endTag").textContent = `Welt ${G.world.n} · ${G.world.name}`;
-  $("endTitle").textContent = last ? "Die Nachricht ist angekommen!" : `Welt ${G.world.n} geschafft!`;
+  $("endTag").textContent = `${ll("Welt", "Mundo")} ${G.world.n} · ${G.world.name}`;
+  $("endTitle").textContent = last ? ll("Die Nachricht ist angekommen!", "¡El mensaje ha llegado!") : ll(`Welt ${G.world.n} geschafft!`, `¡Mundo ${G.world.n} superado!`);
   $("endText").textContent = last
-    ? "Vom Rauchzeichen über Telegraf und Dualzahlen bis zum Logikgatter: Du hast alle vier Welten gemeistert. Trag dich in die Bestenliste ein!"
-    : `Weiter geht's mit Welt ${G.world.n + 1}: ${WORLDS[G.worldIdx + 1].name}. Deine Punkte nimmst du mit, deine Herzen werden wieder aufgefüllt.`;
+    ? ll("Vom Rauchzeichen über Telegraf und Dualzahlen bis zum Logikgatter: Du hast alle vier Welten gemeistert. Trag dich in die Bestenliste ein!",
+         "Desde las señales de humo, pasando por el telégrafo y los números binarios, hasta las puertas lógicas: has dominado los cuatro mundos. ¡Apúntate en la clasificación!")
+    : ll(`Weiter geht's mit Welt ${G.world.n + 1}: ${LO(WORLDS[G.worldIdx + 1]).name}. Deine Punkte nimmst du mit, deine Herzen werden wieder aufgefüllt.`,
+         `Sigue con el mundo ${G.world.n + 1}: ${LO(WORLDS[G.worldIdx + 1]).name}. Te llevas tus puntos y tus corazones se rellenan.`);
   tallyRows(worldRows(true), G.score);
   $("nameRow").hidden = !last; $("bSave").disabled = false;
-  $("bNextWorld").hidden = last; $("bNextWorld").textContent = last ? "" : `Weiter zu Welt ${G.world.n + 1}`;
+  $("bNextWorld").hidden = last; $("bNextWorld").textContent = last ? "" : ll(`Weiter zu Welt ${G.world.n + 1}`, `Ir al mundo ${G.world.n + 1}`);
   $("bStop").hidden = last;
   $("bAgain").hidden = !last;
   $("nameIn").value = store.get("bj_name", "");
@@ -1726,9 +2146,9 @@ function gameOver() {
     if (!G) return;
     mode = "end"; releaseKeys(); hideAll();
     G.reached = G.world.n;
-    $("endTag").textContent = `Welt ${G.world.n} · ${G.world.name}`;
-    $("endTitle").textContent = "Die Nachricht ist verloren …";
-    $("endText").textContent = "Keine Herzen mehr. Lies die Erklärungen nach und versuch es noch einmal!";
+    $("endTag").textContent = `${ll("Welt", "Mundo")} ${G.world.n} · ${G.world.name}`;
+    $("endTitle").textContent = ll("Die Nachricht ist verloren …", "El mensaje se ha perdido…");
+    $("endText").textContent = ll("Keine Herzen mehr. Lies die Erklärungen nach und versuch es noch einmal!", "No te quedan corazones. Repasa las explicaciones y ¡vuelve a intentarlo!");
     tallyRows(worldRows(false), G.score);
     $("nameRow").hidden = false; $("bSave").disabled = false;
     $("bNextWorld").hidden = true; $("bStop").hidden = true; $("bAgain").hidden = false;
@@ -1758,7 +2178,7 @@ async function saveScore(e) {
 }
 async function renderScores() {
   const body = $("scoreBody"), note = $("scoreNote");
-  body.textContent = ""; note.textContent = "Lade …";
+  body.textContent = ""; note.textContent = ll("Lade …", "Cargando…");
   let list = null, src = "local";
   if (online()) {
     try {
@@ -1767,7 +2187,7 @@ async function renderScores() {
     } catch (e) {}
   }
   if (!list) list = store.get("bj_scores", []).slice(0, 15);
-  if (!list.length) { note.textContent = "Noch keine Einträge – sei die oder der Erste!"; return; }
+  if (!list.length) { note.textContent = ll("Noch keine Einträge – sei die oder der Erste!", "Todavía no hay entradas. ¡Sé el primero!"); return; }
   let marked = false;
   list.forEach((s, i) => {
     const tr = document.createElement("tr");
@@ -1775,7 +2195,7 @@ async function renderScores() {
     [i + 1, s.name, s.hero || "–", s.world || 1, s.score].forEach((v, j) => { const td = document.createElement("td"); td.textContent = v; if (j === 4) td.className = "num"; tr.append(td); });
     body.append(tr);
   });
-  note.textContent = src === "online" ? "Gemeinsame Bestenliste für alle Geräte." : "Diese Liste ist nur auf diesem Gerät gespeichert. Die gemeinsame Liste wird über Supabase eingerichtet.";
+  note.textContent = src === "online" ? ll("Gemeinsame Bestenliste für alle Geräte.", "Clasificación común para todos los dispositivos.") : ll("Diese Liste ist nur auf diesem Gerät gespeichert. Die gemeinsame Liste wird über Supabase eingerichtet.", "Esta lista solo se guarda en este dispositivo. La lista común se configura con Supabase.");
 }
 
 // ======================================================================
@@ -2132,7 +2552,7 @@ function drawPlayer() {
     const tx = p.x + p.w / 2, ty = p.y - 26;
     ctx.fillStyle = C.navyD; ctx.fillRect(tx - 34, ty - 17, 68, 24);
     ctx.fillStyle = "#fff"; ctx.fillRect(tx - 34, ty + 5, 68, 2);
-    ctx.textAlign = "center"; ctx.fillText("Tippen!", tx, ty);
+    ctx.textAlign = "center"; ctx.fillText(ll("Tippen!", "¡Toca!"), tx, ty);
     ctx.globalAlpha = 1;
   }
 }
@@ -2252,7 +2672,7 @@ function drawCinema(t) {
     ctx.fillStyle = "rgba(6,13,36,.92)"; ctx.fillRect(0, y, W, 74);
     ctx.fillStyle = "#e9edf6"; ctx.fillRect(0, y, W, 3); ctx.fillRect(0, y + 71, W, 3);
     ctx.textAlign = "left";
-    ctx.fillStyle = "#ff5a4a"; ctx.font = "700 15px 'Pixelify Sans', monospace"; ctx.fillText(cfg.label || (cfg.final ? "GROSSES FINALE" : "ENDGEGNER"), 60, y + 24);
+    ctx.fillStyle = "#ff5a4a"; ctx.font = "700 15px 'Pixelify Sans', monospace"; ctx.fillText(cfg.label || (cfg.final ? ll("GROSSES FINALE", "GRAN FINAL") : ll("ENDGEGNER", "JEFE FINAL")), 60, y + 24);
     ctx.fillStyle = "#ffffff"; ctx.font = "700 34px 'Pixelify Sans', monospace"; ctx.fillText(parts[0], 60, y + 58);
     if (parts[1]) { ctx.fillStyle = "#9fb2dd"; ctx.font = "600 18px 'Pixelify Sans', monospace"; ctx.textAlign = "right"; ctx.fillText(parts[1], W - 60, y + 56); }
     ctx.restore();
@@ -2301,10 +2721,10 @@ function drawHUD() {
   ctx.fillStyle = "#6b4a10"; ctx.font = "700 12px 'Pixelify Sans', monospace"; ctx.textAlign = "center"; ctx.fillText("1", x + 9, 27);
   ctx.textAlign = "left"; ctx.font = "600 20px 'Pixelify Sans', monospace"; ctx.fillStyle = "#eef1f8";
   ctx.fillText(String(G.w.bits), x + 24, 30);
-  ctx.fillText(`W${G.world.n} · ${G.world.stationPl} ${G.stationsDone}/4`, x + 70, 30);
+  ctx.fillText(`${ll("W", "M")}${G.world.n} · ${G.world.stationPl} ${G.stationsDone}/4`, x + 70, 30);
   const m = Math.floor(G.w.time / 60), s = String(Math.floor(G.w.time % 60)).padStart(2, "0");
   ctx.fillText(`${m}:${s}`, x + 330, 30);
-  ctx.textAlign = "right"; ctx.fillText(`${G.score} Punkte`, W - 132, 30);
+  ctx.textAlign = "right"; ctx.fillText(`${G.score} ${ll("Punkte", "puntos")}`, W - 132, 30);
   if (G.bossActive && G.boss && G.boss.state !== "enter") {
     const b = G.boss, bw = 380, bx = W / 2 - bw / 2, by = 60;
     ctx.fillStyle = "rgba(6,13,36,.85)"; ctx.fillRect(bx - 8, by - 4, bw + 16, 48); ctx.fillStyle = "#e9edf6"; ctx.fillRect(bx - 8, by + 42, bw + 16, 2);
