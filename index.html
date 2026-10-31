@@ -167,23 +167,23 @@ p{margin:0; line-height:1.5; font-size:16.5px; max-width:62ch}
 .gatebox svg{display:block; width:100%; max-width:420px; height:auto; margin-inline:auto}
 .gatebox .sw{cursor:pointer}
 .gatebox .sw:focus-visible rect{stroke:#ff5a4a; stroke-width:4}
-.tally{display:grid; grid-template-columns:1fr auto; gap:4px 16px; font-size:16px; max-width:400px}
+.tally{display:grid; grid-template-columns:1fr auto; gap:4px 16px; font-size:16px; max-width:400px; color:#06102e; font-weight:600}
 .tally span:nth-child(even){font-family:var(--f-display); font-variant-numeric:tabular-nums; text-align:right}
 .tally .sum{font-weight:700; border-top:2px solid var(--night); padding-top:4px}
 input[type=text]{
-  font:600 18px/1 var(--f-display); padding:10px 12px; border:3px solid var(--night); border-radius:4px;
-  background:#fff; color:#0d1a3f; -webkit-text-fill-color:#0d1a3f; caret-color:#0d1a3f; color-scheme:light;
+  font:700 19px/1 var(--f-display); padding:10px 12px; border:3px solid var(--night); border-radius:4px;
+  background:#fff; color:#000; -webkit-text-fill-color:#000; caret-color:#000; color-scheme:light;
   width:220px; max-width:100%; box-sizing:border-box; -webkit-user-select:text; user-select:text
 }
 input[type=text]::placeholder{color:#7a86a6; -webkit-text-fill-color:#7a86a6; opacity:1}
 input[type=text]:-webkit-autofill{-webkit-box-shadow:0 0 0 40px #fff inset; -webkit-text-fill-color:#0d1a3f}
-.scores{overflow-x:auto}
+.scores{overflow-x:auto; background:rgba(255,255,255,.88); border:2px solid var(--night); border-radius:4px}
 table{border-collapse:collapse; width:100%; font-variant-numeric:tabular-nums}
-th,td{padding:7px 8px; text-align:left; border-bottom:1px solid rgba(20,40,94,.18); font-size:15.5px}
-th{font:600 13px/1 var(--f-display); text-transform:uppercase; letter-spacing:.08em; color:var(--blue)}
+th,td{padding:7px 8px; text-align:left; border-bottom:1px solid rgba(20,40,94,.25); font-size:16px; color:#06102e; font-weight:600}
+th{font:700 13px/1 var(--f-display); text-transform:uppercase; letter-spacing:.08em; color:#14285e}
 td.num{text-align:right; font-family:var(--f-display)}
 tr.me td{background:#dfe7fb}
-.note{font-size:13.5px; color:var(--muted)}
+.note{font-size:14px; color:#1f2b4d; font-weight:600}
 .portrait{display:flex; gap:16px; align-items:center}
 .portrait canvas{width:64px; height:96px; image-rendering:pixelated; flex:none}
 kbd{font:600 13px var(--f-display); border:1.5px solid var(--night); border-radius:3px; padding:1px 5px; background:#fff}
@@ -719,6 +719,43 @@ B4.push(
     e: "NOR gibt nur bei E₁ = 0 und E₂ = 0 eine 1." }
 );
 
+
+// ---------- Superendgegner: Verknüpfungen logischer Grundfunktionen ----------
+const SQ_COMBO = [
+  { type: "combo", g1: "UND", g2: "ODER", e3: 0, want: 1 },
+  { type: "combo", g1: "ODER", g2: "NAND", e3: 1, want: 0 },
+  { type: "combo", g1: "NAND", g2: "UND", e3: 1, want: 1 },
+  { type: "combo", g1: "NOR", g2: "ODER", e3: 0, want: 1 },
+  { type: "combo", g1: "UND", g2: "NOR", e3: 0, want: 0 },
+  { type: "combo", g1: "ODER", g2: "UND", e3: 1, want: 0 }
+];
+const SQ = [
+  { q: "A = (E₁ UND E₂) ODER E₃. Es gilt E₁ = 1, E₂ = 0, E₃ = 0. Was zeigt die LED A?", a: ["A = 0, die LED ist aus", "A = 1, die LED leuchtet"],
+    e: "E₁ UND E₂ = 1 UND 0 = 0. Dann 0 ODER E₃ = 0 ODER 0 = 0." },
+  { q: "A = NICHT (E₁ ODER E₂). Welcher Grundfunktion entspricht diese Verknüpfung?", a: ["NOR", "NAND", "UND", "XOR"],
+    e: "Ein ODER mit umgedrehtem Ausgang ist genau das NOR." },
+  { q: "Wie viele NAND-Gatter braucht man mindestens, um ein UND zu bauen?", a: ["2", "1", "3", "4"],
+    e: "Erstes NAND = NICHT-UND. Ein zweites NAND mit verbundenen Eingängen dreht das Ergebnis zurück: UND." },
+  { q: "Wie viele NAND-Gatter braucht man mindestens, um ein ODER zu bauen?", a: ["3", "2", "1", "4"],
+    e: "Zwei NAND-Gatter als NICHT vor die Eingänge, dann ein drittes NAND: NICHT E₁ NAND NICHT E₂ = E₁ ODER E₂." },
+  { q: "Welche Funktion ergibt (NICHT E₁) NAND (NICHT E₂)?", a: ["ODER", "UND", "NOR", "NICHT"],
+    e: "Das ist eine der De Morganschen Regeln: Aus NAND mit umgedrehten Eingängen wird ODER." },
+  { q: "Ein Gatter liefert A = 1, wenn genau einer der beiden Eingänge 1 ist. Wie heißt es?", a: ["XOR (Exklusiv-ODER)", "ODER", "NAND", "NOR"],
+    e: "Beim XOR ist A = 0, wenn beide Eingänge gleich sind (00 oder 11)." },
+  { q: "Mit welcher Verknüpfung lässt sich ein XOR aus Grundfunktionen bauen?", a: ["(E₁ ODER E₂) UND NICHT (E₁ UND E₂)", "(E₁ UND E₂) ODER NICHT (E₁ ODER E₂)", "NICHT (E₁ ODER E₂)", "(E₁ UND E₂) UND E₂"],
+    e: "„Mindestens einer“ (ODER), aber „nicht beide“ (NICHT UND) – genau einer." },
+  { q: "Treppenhaus: Das Licht lässt sich unten und oben umschalten. Jedes Umlegen eines Schalters ändert den Zustand. Welche Funktion ist das?", a: ["XOR", "UND", "ODER", "NAND"],
+    e: "Die Wechselschaltung: Das Licht ist an, wenn die Schalter verschieden stehen – also XOR." },
+  { q: "Wie viele Zeilen hat die Wahrheitstabelle einer Schaltung mit drei Eingängen E₁, E₂ und E₃?", a: ["8", "6", "9", "3"],
+    e: "Jeder Eingang hat 2 Zustände: 2 · 2 · 2 = 2³ = 8 Kombinationen." },
+  { q: "A = (E₁ ODER E₂) UND E₃. Bei wie vielen der 8 Eingangskombinationen leuchtet die LED A?", a: ["3", "4", "1", "5"],
+    e: "E₃ muss 1 sein, und E₁E₂ darf 01, 10 oder 11 sein – also 3 Fälle." },
+  { q: "Ein Halbaddierer addiert zwei Bits. Welche Gatter braucht er für Summe und Übertrag?", a: ["XOR für die Summe, UND für den Übertrag", "ODER für die Summe, UND für den Übertrag", "UND für die Summe, XOR für den Übertrag", "NOR für beides"],
+    e: "1 + 1 = 10₂: Summe 0 (XOR), Übertrag 1 (UND). So beginnt jedes Rechenwerk im Prozessor." },
+  { q: "Zwei Schließer E₁ und E₂ in Reihe, dazu ein dritter Schließer E₃ parallel zu beiden. Welche Verknüpfung steuert die LED?", a: ["(E₁ UND E₂) ODER E₃", "(E₁ ODER E₂) UND E₃", "E₁ UND E₂ UND E₃", "E₁ ODER E₂ ODER E₃"],
+    e: "Reihe = UND, parallel = ODER. Der Strom fließt über E₁ und E₂ – oder über E₃." }
+];
+
 // ======================================================================
 //  SPRITES
 // ======================================================================
@@ -783,7 +820,14 @@ const HEAD = sprite([
   "...nnnn..nnnn...", "...nnnn..nnnn...", "...nnnN..Nnnn...", "...nnnN..Nnnn...", "...oooo..oooo...", "................"
 ], { y: "#ecd06e", Y: "#c9a440", s: "#f2c8a2", k: "#1c1c24", e: "#6b3f1f", c: "#eba293", m: "#b4545a", r: "#1f3f8f", R: "#16306e", w: "#fbf7f2", n: "#172a5c", N: "#24397a", g: "#c9a54a", d: "#d9b294", o: "#1a1a22", b: "#c9a54a" });
 
-const BOSS_IMG = { pater: PATER, vice: VICE, head: HEAD };
+// Physiklehrer: Haare halb blond, halb braun mit Seitenscheitel, braune Augen, schwarzes T-Shirt, braune Hose
+const PHYS = sprite([
+  "......yyyyy.....", "....hhsyyyyyyy..", "...hhhyyyyyyyyy.", "...hhssssssssyy.", "...hssussusshh..", "....sssSSsss....",
+  "....ssssssss....", ".....smmmms.....", "......ssss......", "..kkkkkkkkkkkk..", ".kkkkkkkkkkkkkk.", ".kkkkkkkzkkkkkk.",
+  ".sKkkkkzkkkkkKs.", ".sKkkkzzzkkkkKs.", ".sKkkkkkzkkkkKs.", "..kkkkkkzkkkkk..", "...LLLLLLLLLL...", "...bbbbbbbbbb...",
+  "...bbbb..bbbb...", "...bbbb..bbbb...", "...bbbB..Bbbb...", "...bbbB..Bbbb...", "...oooo..oooo...", "................"
+], { y: "#ecca6a", h: "#6b4a2b", s: "#f0c49e", S: "#dca783", u: "#5a3418", m: "#a8505a", k: "#1d1d25", K: "#34343f", z: "#ffd34d", L: "#3b2716", b: "#7a5233", B: "#61401f", o: "#1a1a22" });
+const BOSS_IMG = { pater: PATER, vice: VICE, head: HEAD, phys: PHYS };
 const BOSS_OUT = {}; Object.keys(BOSS_IMG).forEach(k => BOSS_OUT[k] = outline(BOSS_IMG[k], "#e3e9f6"));
 
 // ======================================================================
@@ -840,7 +884,16 @@ const WORLDS = [
     enemies: [18, 30, 42, 66, 77], stations: [10, 33, 54, 83], decor: [3, 29, 53, 70] }
 ];
 
-if (location.hash === "#debug") window.__bj = { WORLDS, get G() { return G; } };
+if (/debug/.test(location.hash)) window.__bj = { WORLDS, get G() { return G; }, get Q() { return qState; },
+  solve() { // nur für automatische Tests
+    const q = qState.q;
+    if (q.type === "bits") { const w = q.target.toString(2).padStart(q.n, "0"); [...w].forEach((c, i) => { if (c === "1") $("qOpts").querySelectorAll(".bit")[i].click(); }); }
+    else if (q.type === "gate" || q.type === "combo") { const n = q.type === "combo" ? 2 : (q.gate === "NICHT" ? 1 : 2);
+      for (let v = 0; v < 4; v++) { const a = v & 1, b = v >> 1 & 1; const e = q.type === "combo" ? [a, b, q.e3] : [a, b];
+        const A = q.type === "combo" ? comboA(q, e) : GATE_FN[q.gate](a, b); if (A === q.want && (n === 2 || b === 0)) { qState.inp = e; break; } } }
+    else { const i = qState.opts.findIndex(o => o.ok); qState.opts[i].el.click(); return; }
+    checkInteractive();
+  } };
 
 // ======================================================================
 //  SOUND
@@ -999,7 +1052,8 @@ function startWorld() {
   const w = WORLDS[G.worldIdx];
   Object.assign(G, {
     world: w, hearts: G.maxHearts, jokers: G.hero.jokers, worldStartScore: G.score,
-    w: { bits: 0, stomps: 0, correct: 0, ansPts: 0, time: 0 },
+    w: { bits: 0, stomps: 0, correct: 0, ansPts: 0, time: 0, superOk: 0 },
+    storm: 0, stormTarget: 0, flashT: 0, bolt: null, bcfg: null,
     player: { x: 2 * T, y: 13 * T - 44, w: 24, h: 44, vx: 0, vy: 0, onGround: false, face: 1, coyote: 0, buffer: 0, inv: 0, anim: 0, air: 1, wait: true, atk: 0, atkCd: 0 },
     checkpoint: { x: 2 * T, y: 13 * T - 44 },
     cam: 0, stationsDone: 0, gateOpen: false, gateShut: 1, gateTarget: 1,
@@ -1010,7 +1064,7 @@ function startWorld() {
   releaseKeys(); screenStack = []; hideAll();
   mode = "play";
   toast(ctrl === "tap" ? "Tippe zum Loslaufen!" : `Welt ${w.n}: ${w.name}`);
-  if (location.hash === "#boss") { // Lehrkraft-Test: direkt zum Endgegner
+  if (/^#boss/.test(location.hash)) { // Lehrkraft-Test: direkt zum Endgegner
     G.stations.forEach(s => { s.done = true; s.ok = true; }); G.stationsDone = 4; openGate(); G.player.x = 88 * T; G.cam = COLS * T - W;
   }
 }
@@ -1089,6 +1143,7 @@ function update(dt) {
   } else { dir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0); p.wait = false; }
   const max = RUN * h.speed * (ctrl === "tap" ? .84 : 1);
   p.atk = Math.max(0, p.atk - dt); p.atkCd = Math.max(0, p.atkCd - dt); G.shake = Math.max(0, G.shake - dt);
+  G.flashT = Math.max(0, (G.flashT || 0) - dt); if (G.bolt) { G.bolt.t -= dt; if (G.bolt.t <= 0) G.bolt = null; }
   if (dir) { p.vx += dir * ACC * dt; p.vx = clamp(p.vx, -max, max); p.face = dir; }
   else { const f = FRIC * dt; p.vx = Math.abs(p.vx) <= f ? 0 : p.vx - Math.sign(p.vx) * f; }
   // Springen
@@ -1199,68 +1254,90 @@ function openGate() {
 //  ENDGEGNER: drei Fragen
 // ======================================================================
 const BOSS_HOME = 104 * T, GROUND_B = 13 * T - 96;
-const BOSS_SHOUT = { pater: "Halt! Wer betritt meine Bibliothek?", vice: "Moment mal! Hier geht's nur mit Prüfung weiter!", head: "Ah – Besuch in meinem Reich der Bits!" };
+const BOSS_SHOUT = { pater: "Halt! Wer betritt meine Bibliothek?", vice: "Moment mal! Hier geht's nur mit Prüfung weiter!", head: "Ah – Besuch in meinem Reich der Bits!", phys: "Nicht so schnell!" };
+const PHYS_CFG = { members: ["phys"], drop: true, super: true, label: "SUPERENDGEGNER", title: "DER PHYSIKLEHRER · HERR DER SCHALTUNGEN", who: ["Der Physiklehrer"],
+  hello: "Bestanden? Nicht so schnell! Ein Physiklehrer will nicht nur wissen, ob die LED leuchtet – sondern warum. Ich habe drei schwere Fragen zu Verknüpfungen für dich. Falsche Antworten kosten hier kein Herz, aber jede richtige bringt viele Punkte.",
+  bye: "Donnerwetter! Du verknüpfst Gatter wie ein Profi. Deine Nachricht ist angekommen – und du darfst dich ab heute echter Bit-Jäger nennen!" };
 const BOSS_CALL = {
   pater: ["Komm ruhig näher, junger Bote!", "Nur keine Scheu – komm her!"],
   vice: ["Na komm, trau dich ran!", "Hierher, ich beiß nicht!"],
-  head: ["Komm doch mal zu mir!", "Na, wird's bald? Komm her!"]
+  head: ["Komm doch mal zu mir!", "Na, wird's bald? Komm her!"],
+  phys: ["Komm her, wir müssen reden!", "Na los – ab an die Tafel!"]
 };
 const pick = a => a[Math.random() * a.length | 0];
-function startBoss() {
-  const w = G.world;
+function startBoss(cfg) {
+  cfg = cfg || G.world.boss; G.bcfg = cfg;
   G.bossActive = true; G.gateOpen = false; G.gateTarget = 1;
   for (let y = 3; y <= 12; y++) G.grid[y][87] = 9;
   G.checkpoint = { x: 89 * T, y: 13 * T - 44 };
   G.shake = .35; sfx("gate");
-  const n = w.boss.members.length;
-  const mem = w.boss.members.map((k, i) => ({
-    k, tx: n === 1 ? BOSS_HOME : 99 * T + i * 4 * T, x: 114 * T + i * 2.6 * T, y: GROUND_B, vy: 0,
-    bob: i * 1.3, flash: 0, say: "", sayT: 0, arrived: false, walking: false, delay: .5 + i * .6
+  const n = cfg.members.length;
+  const mem = cfg.members.map((k, i) => ({
+    k, tx: n === 1 ? BOSS_HOME : 99 * T + i * 4 * T, x: cfg.drop ? BOSS_HOME : 114 * T + i * 2.6 * T, y: cfg.drop ? -260 : GROUND_B, vy: 0,
+    bob: i * 1.3, flash: 0, say: "", sayT: 0, arrived: false, walking: false, delay: (cfg.drop ? 1.1 : .5) + i * .6, hold: !!cfg.drop, drop: !!cfg.drop
   }));
-  const total = w.boss.final ? 6 : 3;
+  const total = cfg.final ? 6 : 3;
   G.boss = { members: mem, x: mem[0].tx, y: GROUND_B, w: mem[n - 1].tx + 56 - mem[0].tx, h: 96, hp: total, maxHp: total,
     state: "enter", t: 0, active: 0, callT: 0, caller: n > 1 ? 1 : 0 };
   G.cine = 0; G.toasts = [];
-  bossFanfare();
+  if (cfg.drop) { thunder(0); G.flashT = .5; } else bossFanfare();
+}
+// Gewitter: Kommission flieht, der Physiklehrer erscheint
+function superBoss() {
+  const b = G.boss;
+  b.state = "exit"; b.t = 0;
+  G.stormTarget = 1; G.flashT = .7; G.shake = .5; thunder(0);
+  const lines = ["Oh oh … hört ihr das?", "Ein Gewitter?!", "Schnell weg hier!"];
+  b.members.forEach((m, i) => { m.vy = -200; say(m, lines[i % lines.length], 2); });
+  setTimeout(() => { if (G && !G.over) startBoss(PHYS_CFG); }, 2900);
 }
 async function bossQuiz() {
-  const w = G.world, b = G.boss;
+  const cfg = G.bcfg, b = G.boss;
   const lead = b.members.length > 1 ? 1 : 0;
   b.state = "talk";
-  await talk(w.boss.who[lead], w.boss.hello, "Ich bin bereit", w.boss.members[lead]);
+  await talk(cfg.who[lead], cfg.hello, "Ich bin bereit", cfg.members[lead]);
   let qs, askers;
-  if (w.boss.final) {
+  if (cfg.super) {
+    qs = [pick(SQ_COMBO)].concat(shuffle(SQ).slice(0, 2));
+    askers = [0, 0, 0];
+  } else if (cfg.final) {
     // Runde 1: Wiederholung aus allen Welten, Runde 2: Logik
     const pool = { pater: B1, head: B3, vice: B2 };
     const logic = shuffle(B4.filter(q => q.type)).slice(0, 1).concat(shuffle(B4.filter(q => !q.type)).slice(0, 2));
     qs = b.members.map(m => pick(pool[m.k])).concat(shuffle(logic));
     askers = [0, 1, 2, 0, 1, 2];
   } else {
-    const inter = shuffle(w.bq.filter(q => q.type)), mc = shuffle(w.bq.filter(q => !q.type));
+    const inter = shuffle(G.world.bq.filter(q => q.type)), mc = shuffle(G.world.bq.filter(q => !q.type));
     qs = shuffle((inter.length ? [inter[0]] : []).concat(mc).slice(0, 3));
     askers = [0, 0, 0];
   }
   const praise = ["Sehr gut!", "Richtig, weiter so!", "Ausgezeichnet!", "Stark!", "Genau so!", "Hervorragend!"];
   for (let i = 0; i < qs.length; i++) {
     if (!G || G.over) return;
-    if (w.boss.final && i === 3) { say(b.members[1], "Zweite Runde: jetzt wird's logisch!", 1.8); await new Promise(r => setTimeout(r, 1500)); if (!G || G.over) return; }
+    if (cfg.final && i === 3) { say(b.members[1], "Zweite Runde: jetzt wird's logisch!", 1.8); await new Promise(r => setTimeout(r, 1500)); if (!G || G.over) return; }
     b.active = askers[i];
     const m = b.members[b.active];
     b.state = "ask";
-    const ok = await ask(qs[i], `${w.boss.who[b.active]} · Frage ${i + 1} von ${qs.length}`);
+    const ok = await ask(qs[i], `${cfg.who[b.active]} · ${cfg.super ? "Superfrage" : "Frage"} ${i + 1} von ${qs.length}`);
     if (!G || G.over) return;
     b.hp--;
-    if (ok) { G.w.correct++; G.score += 150; G.w.ansPts += 150; m.flash = .5; m.vy = -260; say(m, praise[i % praise.length], 1.4); }
+    if (cfg.super) {
+      if (ok) { G.w.superOk++; G.score += 250; m.flash = .5; m.vy = -260; say(m, ["Donnerwetter!", "Elektrisierend gut!", "Volle Spannung – richtig!"][i], 1.6); G.flashT = .25; }
+      else { say(m, "Hm, da fehlt noch Spannung.", 1.6); sfx("wrong"); }
+    } else if (ok) { G.w.correct++; G.score += 150; G.w.ansPts += 150; m.flash = .5; m.vy = -260; say(m, praise[i % praise.length], 1.4); }
     else { say(m, "Hmm … das solltest du nachlesen.", 1.6); loseHeartQuiet(); if (G.over) return; }
     b.state = "idle";
     await new Promise(r => setTimeout(r, 1300));
   }
   if (!G || G.over || G.won) return;
-  G.won = true; b.state = "done"; b.t = 0; sfx("win");
-  b.members.forEach(m => say(m, "Bestanden!", 2.4));
+  b.state = "done"; b.t = 0; sfx("win");
+  b.members.forEach(m => say(m, cfg.super ? (G.w.superOk === 3 ? "Alle drei richtig – Respekt!" : "Gut gekämpft!") : "Bestanden!", 2.4));
+  if (cfg.final) { G.w.superOk = 0; setTimeout(() => { if (G && !G.over) superBoss(); }, 2400); return; }
+  G.won = true;
+  if (cfg.super) G.stormTarget = 0;
   setTimeout(async () => {
     if (!G) return;
-    await talk(w.boss.who[lead], w.boss.bye, "Zur Auswertung", w.boss.members[lead]);
+    await talk(cfg.who[lead], cfg.bye, "Zur Auswertung", cfg.members[lead]);
     worldWon();
   }, 2200);
 }
@@ -1273,6 +1350,21 @@ function tone(f, at, dur, type, vol) {
     o.type = type || "square"; o.frequency.setValueAtTime(f, n);
     g.gain.setValueAtTime(vol || .045, n); g.gain.exponentialRampToValueAtTime(.0001, n + dur);
     o.connect(g); g.connect(AC.destination); o.start(n); o.stop(n + dur + .03);
+  } catch (e) {}
+}
+function thunder(at) {
+  try {
+    if (muted) return;
+    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    if (AC.state === "suspended") AC.resume();
+    const len = 2.8, sr = AC.sampleRate, buf = AC.createBuffer(1, sr * len, sr), d = buf.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < d.length; i++) { const wn = Math.random() * 2 - 1; last = (last + .03 * wn) / 1.03; d[i] = last * 4 + (i < sr * .12 ? wn * .5 * (1 - i / (sr * .12)) : 0); }
+    const src = AC.createBufferSource(); src.buffer = buf;
+    const f = AC.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 700;
+    const g = AC.createGain(), n = AC.currentTime + (at || 0);
+    g.gain.setValueAtTime(.0001, n); g.gain.exponentialRampToValueAtTime(.8, n + .04); g.gain.exponentialRampToValueAtTime(.3, n + .8); g.gain.exponentialRampToValueAtTime(.0001, n + len);
+    src.connect(f); f.connect(g); g.connect(AC.destination); src.start(n); src.stop(n + len);
   } catch (e) {}
 }
 function bossFanfare() {
@@ -1295,12 +1387,31 @@ function updateBoss(dt) {
   const b = G.boss, p = G.player;
   b.t += dt;
   G.cine = clamp((G.cine || 0) + (b.state === "enter" ? dt * 2.2 : -dt * 2), 0, 1);
+  G.storm = clamp((G.storm || 0) + Math.sign((G.stormTarget || 0) - (G.storm || 0)) * dt * 1.5, 0, 1);
+  if (G.storm > .5 && b.state !== "enter" && Math.random() < dt * .25) { G.flashT = .35; thunder(.15); }
   b.members.forEach(m => {
     m.bob += dt; m.flash = Math.max(0, m.flash - dt); m.sayT -= dt; if (m.sayT <= 0) m.say = "";
-    if (m.y < GROUND_B || m.vy) { m.vy += GRAV * dt; m.y += m.vy * dt; if (m.y >= GROUND_B) { m.y = GROUND_B; m.vy = 0; } }
+    if (m.hold) return;
+    if (m.y < GROUND_B || m.vy) {
+      m.vy += GRAV * dt; m.y += m.vy * dt;
+      if (m.y >= GROUND_B) {
+        m.y = GROUND_B; m.vy = 0;
+        if (m.drop && !m.arrived) {
+          m.arrived = true; m.flash = .9; G.shake = .6; G.flashT = .6; thunder(0); sfx("stomp");
+          for (let k = 0; k < 30; k++) G.parts.push({ x: m.x + 28, y: 13 * T - 6, vx: (Math.random() - .5) * 520, vy: -Math.random() * 300, life: .8, max: .8, r: 3, color: k % 2 ? "#ffe066" : "#9fd8ff", g: 500 });
+          say(m, BOSS_SHOUT[m.k], 2.4);
+        }
+      }
+    }
   });
-  if (b.state === "enter") {
+  if (b.state === "exit") {
+    b.members.forEach(m => { m.walking = true; m.x += 300 * dt; });
+  } else if (b.state === "enter") {
     b.members.forEach((m, i) => {
+      if (m.drop) {
+        if (m.hold && b.t >= m.delay) { m.hold = false; m.vy = 200; G.bolt = { x: m.x + 28, t: .45 }; G.flashT = .8; thunder(0); }
+        return;
+      }
       if (b.t < m.delay || m.arrived) return;
       m.walking = true;
       m.x -= 210 * dt;
@@ -1311,7 +1422,7 @@ function updateBoss(dt) {
         if (b.members.length === 1 || i === 1) say(m, b.members.length === 1 ? BOSS_SHOUT[m.k] : "Die Prüfungskommission tagt!", 2.4);
       }
     });
-    if (b.members.every(m => m.arrived) && b.t > b.members[b.members.length - 1].delay + 3.4) {
+    if (b.members.every(m => m.arrived) && b.t > b.members[b.members.length - 1].delay + (b.members[0].drop ? 2.6 : 3.4)) {
       b.state = "call"; b.t = 0; b.callT = 0;
       if (ctrl === "tap") p.wait = true;
     }
@@ -1366,7 +1477,41 @@ function gateSVG(gate, e1, e2, aState, interactive) {
   return s + "</svg>";
 }
 
+function comboSVG(q, e, aState, interactive) {
+  const navy = "#14285e", neg = g => g === "NAND" || g === "NOR";
+  const X = GATE_FN[q.g1](e[0], e[1]);
+  let s = `<svg viewBox="0 0 420 190" role="img" aria-label="Verknüpfung aus ${q.g1} und ${q.g2} mit LED am Ausgang A">`;
+  const sw = (i, y, fixed) => {
+    const on = e[i] === 1;
+    s += `<line x1="72" y1="${y}" x2="${i < 2 ? 112 : 252}" y2="${y}" stroke="${on ? "#d4483c" : navy}" stroke-width="3"/>`;
+    s += `<g class="${fixed ? "" : "sw"}" data-i="${i}" ${interactive && !fixed ? 'tabindex="0" role="button"' : ""} aria-label="Eingang E${i + 1} = ${e[i]}${fixed ? " (fest)" : ""}">`;
+    s += `<rect x="6" y="${y - 18}" width="66" height="36" rx="6" fill="${fixed ? "#d7dce8" : on ? navy : "#ffffff"}" stroke="${navy}" stroke-width="2.5" ${fixed ? 'stroke-dasharray="4 3"' : ""}/>`;
+    s += `<text x="39" y="${y + 6}" text-anchor="middle" font-family="Pixelify Sans, monospace" font-size="16" font-weight="700" fill="${on && !fixed ? "#ffffff" : navy}">E${"₁₂₃"[i]} = ${e[i]}</text></g>`;
+    if (fixed) s += `<text x="39" y="${y + 32}" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-size="11" fill="#4d5a7a">fest</text>`;
+  };
+  // Gatter 1
+  s += `<line x1="${neg(q.g1) ? 180 : 172}" y1="60" x2="212" y2="60" stroke="${X ? "#d4483c" : navy}" stroke-width="3"/><line x1="212" y1="60" x2="212" y2="100" stroke="${X ? "#d4483c" : navy}" stroke-width="3"/><line x1="212" y1="100" x2="252" y2="100" stroke="${X ? "#d4483c" : navy}" stroke-width="3"/>`;
+  sw(0, 38, false); sw(1, 82, false); sw(2, 148, true);
+  s += `<rect x="112" y="20" width="60" height="80" fill="#fff" stroke="${navy}" stroke-width="3"/><text x="142" y="56" text-anchor="middle" font-family="Pixelify Sans, monospace" font-size="22" font-weight="700" fill="${navy}">${GATE_SYM[q.g1]}</text><text x="142" y="88" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-size="11" fill="#4d5a7a">${q.g1}</text>`;
+  if (neg(q.g1)) s += `<circle cx="176" cy="60" r="5" fill="#fff" stroke="${navy}" stroke-width="2.5"/>`;
+  // Gatter 2
+  s += `<rect x="252" y="80" width="60" height="90" fill="#fff" stroke="${navy}" stroke-width="3"/><text x="282" y="122" text-anchor="middle" font-family="Pixelify Sans, monospace" font-size="22" font-weight="700" fill="${navy}">${GATE_SYM[q.g2]}</text><text x="282" y="158" text-anchor="middle" font-family="Atkinson Hyperlegible, sans-serif" font-size="11" fill="#4d5a7a">${q.g2}</text>`;
+  if (neg(q.g2)) s += `<circle cx="316" cy="124" r="5" fill="#fff" stroke="${navy}" stroke-width="2.5"/>`;
+  const lit = aState === 1;
+  s += `<line x1="${neg(q.g2) ? 321 : 312}" y1="124" x2="362" y2="124" stroke="${lit ? "#d4483c" : navy}" stroke-width="3"/>`;
+  if (lit) s += `<circle cx="380" cy="124" r="25" fill="#ff5a4a" opacity=".25"/>`;
+  s += `<circle cx="380" cy="124" r="16" fill="${aState === null ? "#d7dce8" : lit ? "#ff5a4a" : "#3a3f55"}" stroke="${navy}" stroke-width="3"/>`;
+  if (aState === null) s += `<text x="380" y="130" text-anchor="middle" font-family="Pixelify Sans, monospace" font-size="17" font-weight="700" fill="${navy}">?</text>`;
+  s += `<path d="M392 105 l10 -10 M396 95 h6 v6 M400 112 l10 -10 M404 102 h6 v6" stroke="${navy}" stroke-width="2" fill="none"/>`;
+  s += `<text x="380" y="164" text-anchor="middle" font-family="Pixelify Sans, monospace" font-size="16" font-weight="700" fill="${navy}">A${aState === null ? "" : " = " + aState}</text>`;
+  return s + "</svg>";
+}
+const comboA = (q, e) => GATE_FN[q.g2](GATE_FN[q.g1](e[0], e[1]), e[2]);
 function prepQ(q) {
+  if (q.type === "combo") {
+    const word = q.want ? "leuchtet" : "aus ist";
+    return { ...q, q: `Verknüpfung: A = (E₁ ${q.g1} E₂) ${q.g2} E₃. E₃ ist fest auf ${q.e3}. Lege E₁ und E₂ so, dass die LED A ${word}.` };
+  }
   if (q.type === "bits") {
     const max = 2 ** q.n - 1;
     let t; do { t = 3 + Math.floor(Math.random() * (max - 2)); } while (q.n === 8 && t < 20);
@@ -1410,6 +1555,20 @@ function ask(q0, tag) {
         row.append(b);
       }
       box.append(row);
+      $("qCheck").hidden = false;
+      $("qCheck").onclick = () => checkInteractive();
+    } else if (q.type === "combo") {
+      qState.inp = [0, 0, q.e3];
+      const d = document.createElement("div"); d.className = "gatebox"; box.append(d);
+      const draw = () => {
+        d.innerHTML = comboSVG(q, qState.inp, qState.answered ? comboA(q, qState.inp) : null, !qState.answered);
+        d.querySelectorAll(".sw").forEach(g => {
+          const tog = () => { if (qState.answered) return; const i = +g.dataset.i; qState.inp[i] ^= 1; sfx("click"); draw(); const f = d.querySelector(`.sw[data-i="${i}"]`); f && f.focus(); };
+          g.addEventListener("click", tog);
+          g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); tog(); } });
+        });
+      };
+      qState.draw = draw; draw();
       $("qCheck").hidden = false;
       $("qCheck").onclick = () => checkInteractive();
     } else if (q.type === "gate") {
@@ -1487,6 +1646,11 @@ function checkInteractive() {
     btns.forEach((b, i) => { b.disabled = true; if (!ok && want[i] === "1") b.classList.add("sol"); });
     const expl = `${want}${SUB(2)} = ${parts.join(" + ")} = ${q.target}.`;
     feedback(ok, ok ? expl : `Du hast ${qState.bits.join("")}${SUB(2)} = ${val} eingestellt. Richtig wäre ${expl} Die grün umrandeten Stellen gehören eingeschaltet.`);
+  } else if (q.type === "combo") {
+    const [a, b, c] = qState.inp, X = GATE_FN[q.g1](a, b), A = comboA(q, qState.inp);
+    const ok = A === q.want; qState.ok = ok;
+    qState.draw();
+    feedback(ok, `Zwischenergebnis: E₁ ${q.g1} E₂ = ${a} ${q.g1} ${b} = ${X}. Dann ${X} ${q.g2} E₃ = ${X} ${q.g2} ${c} = ${A}.`);
   } else {
     const [a, b] = qState.inp;
     const A = GATE_FN[q.gate](a, b);
@@ -1502,6 +1666,7 @@ function qKey(e) {
   const q = qState.q;
   if (!qState.answered && !q.type) { const n = "1234".indexOf(e.key); if (n >= 0) { e.preventDefault(); answer(n); return; } }
   if (!qState.answered && q.type === "bits") { const n = "12345678".indexOf(e.key); if (n >= 0 && n < q.n) { e.preventDefault(); $("qOpts").querySelectorAll(".bit")[n].click(); return; } }
+  if (!qState.answered && q.type === "combo") { const n = "12".indexOf(e.key); if (n >= 0) { e.preventDefault(); qState.inp[n] ^= 1; sfx("click"); qState.draw(); return; } }
   if (!qState.answered && q.type === "gate") { const n = "12".indexOf(e.key); if (n >= 0 && (n === 0 || q.gate !== "NICHT")) { e.preventDefault(); qState.inp[n] ^= 1; sfx("click"); qState.draw(); return; } }
   if (e.key === "Enter" && !e.target.closest(".sw")) {
     if (qState.answered) { e.preventDefault(); $("qNext").click(); }
@@ -1526,12 +1691,14 @@ function worldRows(won) {
     [`${G.world.enemyName} erledigt (${w.stomps})`, w.stomps * 50],
     [`Richtige Antworten (${w.correct})`, w.ansPts]
   ];
+  if (won && G.world.boss.final) rows.push([`Physiklehrer (${w.superOk} von 3 richtig)`, w.superOk * 250 + (w.superOk === 3 ? 500 : 0)]);
   if (won) rows.push(["Welt geschafft", w.bonus], [`Zeitbonus (${m}:${s} min)`, w.timeBonus], [`Übrige Herzen (${G.hearts})`, w.heartBonus]);
   return rows;
 }
 function worldWon() {
   mode = "end"; G.paused = true; releaseKeys();
   const w = G.w;
+  if (G.world.boss.final && w.superOk === 3) G.score += 500;
   w.bonus = 500; w.timeBonus = Math.max(0, Math.round((240 - w.time) * 2)); w.heartBonus = G.hearts * 100;
   G.score += w.bonus + w.timeBonus + w.heartBonus;
   const last = G.worldIdx === WORLDS.length - 1;
@@ -1989,6 +2156,19 @@ function drawAura(m, t, b) {
       for (let j = 1; j <= 4; j++) { const r = r0 + (r1 - r0) * j / 4, a = a0 + (Math.random() - .5) * .5; ctx.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); }
       ctx.stroke();
     }
+  } else if (m.k === "phys") { // Atommodell mit kreisenden Elektronen und Blitzen
+    ctx.translate(cx, cy - 6);
+    ctx.strokeStyle = `rgba(140,200,255,${.55 * strong})`; ctx.lineWidth = 2;
+    for (let k = 0; k < 3; k++) {
+      ctx.save(); ctx.rotate(k * Math.PI / 3); ctx.beginPath(); ctx.ellipse(0, 0, 70, 24, 0, 0, Math.PI * 2); ctx.stroke();
+      const a = t * 3 + k * 2; ctx.fillStyle = `rgba(255,230,110,${strong})`; ctx.beginPath(); ctx.arc(Math.cos(a) * 70, Math.sin(a) * 24, 5, 0, 7); ctx.fill();
+      ctx.restore();
+    }
+    if (Math.random() < .3 * strong) {
+      ctx.strokeStyle = "rgba(200,230,255,.9)"; ctx.beginPath(); const a0 = Math.random() * 6.28; ctx.moveTo(Math.cos(a0) * 30, Math.sin(a0) * 30);
+      for (let j = 1; j < 5; j++) ctx.lineTo(Math.cos(a0) * (30 + j * 14) + (Math.random() - .5) * 14, Math.sin(a0) * (30 + j * 14) + (Math.random() - .5) * 14);
+      ctx.stroke();
+    }
   } else { // Regen aus Nullen und Einsen
     ctx.font = "700 14px 'Pixelify Sans', monospace"; ctx.textAlign = "center";
     for (let k = 0; k < 14; k++) {
@@ -2027,11 +2207,27 @@ function drawBoss(t) {
         ctx.fillStyle = "#8a7a66"; for (let k = 0; k < 4; k++) { ctx.fillRect(ox - 18, oy + 3 + k * 4, 14, 1.5); ctx.fillRect(ox + 4, oy + 3 + k * 4, 14, 1.5); }
       } else {
         ctx.fillStyle = C.navy; ctx.fillRect(ox - 20, oy - 4, 40, 26); ctx.strokeStyle = "#e9edf6"; ctx.lineWidth = 2; ctx.strokeRect(ox - 20, oy - 4, 40, 26);
-        ctx.fillStyle = "#fff"; ctx.font = "700 18px 'Pixelify Sans', monospace"; ctx.textAlign = "center"; ctx.fillText(m.k === "head" ? "01?" : "·−?", ox, oy + 15);
+        ctx.fillStyle = "#fff"; ctx.font = "700 18px 'Pixelify Sans', monospace"; ctx.textAlign = "center"; ctx.fillText(m.k === "head" ? "01?" : m.k === "phys" ? "&≥1" : "·−?", ox, oy + 15);
       }
     }
     if (m.say) bubble(m.x + 28, m.y - (asking ? 46 : 14), m.say);
   });
+}
+function drawStorm(t) {
+  const k = G.storm || 0;
+  if (k > 0) {
+    ctx.fillStyle = `rgba(3,6,20,${.5 * k})`; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = `rgba(170,200,255,${.45 * k})`; ctx.lineWidth = 1.5; ctx.beginPath();
+    for (let i = 0; i < 90; i++) { const x = (i * 97 + t * 260) % (W + 60) - 30, y = (i * 53 + t * 900) % (H + 40) - 20; ctx.moveTo(x, y); ctx.lineTo(x - 6, y + 18); }
+    ctx.stroke();
+  }
+  if (G.bolt) {
+    const bx = G.bolt.x - Math.round(G.cam), a = clamp(G.bolt.t / .45, 0, 1);
+    ctx.strokeStyle = `rgba(255,255,255,${a})`; ctx.lineWidth = 5; ctx.shadowColor = "#9fd8ff"; ctx.shadowBlur = 24;
+    ctx.beginPath(); let x = bx + 30, y = 0; ctx.moveTo(x, y);
+    while (y < 13 * T) { y += 34; x = bx + (Math.random() - .5) * 60 * (1 - y / (13 * T)); ctx.lineTo(x, y); }
+    ctx.stroke(); ctx.shadowBlur = 0;
+  }
 }
 // Kino-Balken, Spotlight und Namensbanner beim Auftritt
 function drawCinema(t) {
@@ -2049,14 +2245,14 @@ function drawCinema(t) {
   ctx.fillStyle = "#03060f"; ctx.fillRect(0, 0, W, bh); ctx.fillRect(0, H - bh, W, bh);
   // Banner
   if (b.state === "enter" && b.t > .3) {
-    const parts = G.world.boss.title.split(" · ");
+    const cfg = G.bcfg || G.world.boss, parts = cfg.title.split(" · ");
     const s = clamp((b.t - .3) / .45, 0, 1), e = 1 - Math.pow(1 - s, 3);
     const x = -W + e * W, y = 92;
     ctx.save(); ctx.translate(x, 0);
     ctx.fillStyle = "rgba(6,13,36,.92)"; ctx.fillRect(0, y, W, 74);
     ctx.fillStyle = "#e9edf6"; ctx.fillRect(0, y, W, 3); ctx.fillRect(0, y + 71, W, 3);
     ctx.textAlign = "left";
-    ctx.fillStyle = "#ff5a4a"; ctx.font = "700 15px 'Pixelify Sans', monospace"; ctx.fillText(G.world.boss.final ? "GROSSES FINALE" : "ENDGEGNER", 60, y + 24);
+    ctx.fillStyle = "#ff5a4a"; ctx.font = "700 15px 'Pixelify Sans', monospace"; ctx.fillText(cfg.label || (cfg.final ? "GROSSES FINALE" : "ENDGEGNER"), 60, y + 24);
     ctx.fillStyle = "#ffffff"; ctx.font = "700 34px 'Pixelify Sans', monospace"; ctx.fillText(parts[0], 60, y + 58);
     if (parts[1]) { ctx.fillStyle = "#9fb2dd"; ctx.font = "600 18px 'Pixelify Sans', monospace"; ctx.textAlign = "right"; ctx.fillText(parts[1], W - 60, y + 56); }
     ctx.restore();
@@ -2113,7 +2309,7 @@ function drawHUD() {
     const b = G.boss, bw = 380, bx = W / 2 - bw / 2, by = 60;
     ctx.fillStyle = "rgba(6,13,36,.85)"; ctx.fillRect(bx - 8, by - 4, bw + 16, 48); ctx.fillStyle = "#e9edf6"; ctx.fillRect(bx - 8, by + 42, bw + 16, 2);
     ctx.fillStyle = "#eef1f8"; ctx.textAlign = "center"; ctx.font = "600 15px 'Pixelify Sans', monospace";
-    ctx.fillText(G.world.boss.title, W / 2, by + 14);
+    ctx.fillText((G.bcfg || G.world.boss).title, W / 2, by + 14);
     for (let i = 0; i < b.maxHp; i++) {
       const cx = W / 2 - (b.maxHp - 1) * (b.maxHp > 3 ? 18 : 22) + i * (b.maxHp > 3 ? 36 : 44);
       ctx.fillStyle = i < b.hp ? C.navy : "rgba(233,237,246,.2)"; ctx.fillRect(cx - 13, by + 22, 26, 16);
@@ -2164,8 +2360,10 @@ function frame(now) {
   if (G.bossActive) drawBoss(clock);
   drawPlayer();
   ctx.restore();
+  drawStorm(clock);
   drawHUD();
   drawCinema(clock);
+  if (G.flashT > 0) { ctx.fillStyle = `rgba(235,242,255,${Math.min(.85, G.flashT * 1.4)})`; ctx.fillRect(0, 0, W, H); }
   requestAnimationFrame(frame);
 }
 
