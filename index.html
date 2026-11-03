@@ -380,8 +380,8 @@ ul.help{margin:0; padding-left:20px; line-height:1.55; font-size:16px}
     #alle   alle Welten freischalten
     #boss   direkt zum Endgegner der gewählten Welt
 */
-const SUPABASE_URL = "";   // z. B. "https://xyzabc.supabase.co"
-const SUPABASE_KEY = "";   // anon public key
+const SUPABASE_URL = "https://ypquuohklrkglphvqpth.supabase.co";
+const SUPABASE_KEY = "sb_publishable_dBfLxcibj4gMZPRwtVO1hg_lXU_OQnw";   // publishable key (öffentlich, darf ins Spiel)
 const SCORE_TABLE  = "bitjaeger_scores";
 
 (() => {
@@ -1109,13 +1109,13 @@ const HEAD = sprite([
   "...nnnn..nnnn...", "...nnnn..nnnn...", "...nnnN..Nnnn...", "...nnnN..Nnnn...", "...oooo..oooo...", "................"
 ], { y: "#ecd06e", Y: "#c9a440", s: "#f2c8a2", k: "#1c1c24", e: "#6b3f1f", c: "#eba293", m: "#b4545a", r: "#1f3f8f", R: "#16306e", w: "#fbf7f2", n: "#172a5c", N: "#24397a", g: "#c9a54a", d: "#d9b294", o: "#1a1a22", b: "#c9a54a" });
 
-// Physiklehrer: Haare gleichmäßig blond-braun meliert mit Seitenscheitel, schwarze Brille, braune Augen, schwarzes T-Shirt, braune Hose
+// Physiklehrer: Haare links blond (ca. ein Drittel), rechts braun, mit Seitenscheitel, schwarze Brille, braune Augen, schwarzes T-Shirt, braune Hose
 const PHYS = sprite([
-  ".....hyhyhy.....", "....yhshyhyhy...", "...hyhshyhyhyh..", "...hssssssssh...", "...hkkksskkkh...", "...hkuksskukh...",
+  ".....yhhhhh.....", "....yyshhhhhh...", "...yyyshhhhhhh..", "...yssssssssh...", "...ykkksskkkh...", "...ykuksskukh...",
   "....sssSSsss....", ".....smmmms.....", "......ssss......", "..kkkkkkkkkkkk..", ".kkkkkkkkkkkkkk.", ".kkkkkkkkkkkkkk.",
   ".sKkkkkkkkkkkKs.", ".sKkkkkkkkkkkKs.", ".sKkkkkkkkkkkKs.", "..kkkkkkkkkkkk..", "...LLLLLLLLLL...", "...bbbbbbbbbb...",
   "...bbbb..bbbb...", "...bbbb..bbbb...", "...bbbB..Bbbb...", "...bbbB..Bbbb...", "...oooo..oooo...", "................"
-], { y: "#b8955a", h: "#6b4a2b", s: "#f0c49e", S: "#dca783", u: "#5a3418", l: "#cfd9ea", m: "#a8505a", k: "#1d1d25", K: "#34343f", z: "#ffd34d", L: "#3b2716", b: "#7a5233", B: "#61401f", o: "#1a1a22" });
+], { y: "#d9b45c", h: "#6b4a2b", s: "#f0c49e", S: "#dca783", u: "#5a3418", l: "#cfd9ea", m: "#a8505a", k: "#1d1d25", K: "#34343f", z: "#ffd34d", L: "#3b2716", b: "#7a5233", B: "#61401f", o: "#1a1a22" });
 const BOSS_IMG = { pater: PATER, vice: VICE, head: HEAD, phys: PHYS };
 const BOSS_OUT = {}; Object.keys(BOSS_IMG).forEach(k => BOSS_OUT[k] = outline(BOSS_IMG[k], "#e3e9f6"));
 
@@ -2172,7 +2172,7 @@ async function saveScore(e) {
   if (!online()) return;
   try {
     await fetch(`${SUPABASE_URL}/rest/v1/${SCORE_TABLE}`, { method: "POST",
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+      headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
       body: JSON.stringify(e) });
   } catch (err) {}
 }
@@ -2182,7 +2182,7 @@ async function renderScores() {
   let list = null, src = "local";
   if (online()) {
     try {
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/${SCORE_TABLE}?select=name,hero,score,world&order=score.desc&limit=15`, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/${SCORE_TABLE}?select=name,hero,score,world&order=score.desc&limit=15`, { headers: { apikey: SUPABASE_KEY } });
       if (r.ok) { list = await r.json(); src = "online"; }
     } catch (e) {}
   }
