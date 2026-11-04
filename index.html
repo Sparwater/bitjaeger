@@ -383,6 +383,7 @@ ul.help{margin:0; padding-left:20px; line-height:1.55; font-size:16px}
 const SUPABASE_URL = "https://ypquuohklrkglphvqpth.supabase.co";
 const SUPABASE_KEY = "sb_publishable_dBfLxcibj4gMZPRwtVO1hg_lXU_OQnw";   // publishable key (öffentlich, darf ins Spiel)
 const SCORE_TABLE  = "bitjaeger_scores";
+const BJ_VERSION   = "Version 4.11.";
 
 (() => {
 "use strict";
@@ -2169,33 +2170,45 @@ $("bSave").onclick = async () => {
 const online = () => SUPABASE_URL && SUPABASE_KEY;
 async function saveScore(e) {
   const loc = store.get("bj_scores", []); loc.push({ ...e, created_at: new Date().toISOString() }); loc.sort((a, b) => b.score - a.score); store.set("bj_scores", loc.slice(0, 50));
+  saveErr = "";
   if (!online()) return;
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/${SCORE_TABLE}`, { method: "POST",
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/${SCORE_TABLE}`, { method: "POST", cache: "no-store",
       headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=minimal" },
       body: JSON.stringify(e) });
-  } catch (err) {}
+    if (!r.ok) saveErr = `${r.status} ${(await r.text()).slice(0, 160)}`;
+  } catch (err) { saveErr = String(err && err.message || err).slice(0, 160); }
 }
+let saveErr = "";
 async function renderScores() {
   const body = $("scoreBody"), note = $("scoreNote");
   body.textContent = ""; note.textContent = ll("Lade …", "Cargando…");
-  let list = null, src = "local";
+  let list = null, src = "local", loadErr = "";
   if (online()) {
     try {
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/${SCORE_TABLE}?select=name,hero,score,world&order=score.desc&limit=15`, { headers: { apikey: SUPABASE_KEY } });
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/${SCORE_TABLE}?select=name,hero,score,world&order=score.desc&limit=15`, { headers: { apikey: SUPABASE_KEY }, cache: "no-store" });
       if (r.ok) { list = await r.json(); src = "online"; }
-    } catch (e) {}
+      else loadErr = `${r.status} ${(await r.text()).slice(0, 160)}`;
+    } catch (e) { loadErr = String(e && e.message || e).slice(0, 160); }
   }
   if (!list) list = store.get("bj_scores", []).slice(0, 15);
-  if (!list.length) { note.textContent = ll("Noch keine Einträge – sei die oder der Erste!", "Todavía no hay entradas. ¡Sé el primero!"); return; }
+  if (!list.length) { note.textContent = ll("Noch keine Einträge – sei die oder der Erste!", "Todavía no hay entradas. ¡Sé el primero!") + (loadErr ? " " + ll(`(Gemeinsame Liste nicht erreichbar, Fehler: ${loadErr})`, `(Lista común no disponible, error: ${loadErr})`) : "") + " · " + BJ_VERSION; return; }
   let marked = false;
-  list.forEach((s, i) => {
-    const tr = document.createElement("tr");
-    if (!marked && lastEntry && s.name === lastEntry.name && s.score === lastEntry.score) { tr.className = "me"; marked = true; }
-    [i + 1, s.name, s.hero || "–", s.world || 1, s.score].forEach((v, j) => { const td = document.createElement("td"); td.textContent = v; if (j === 4) td.className = "num"; tr.append(td); });
+  const row = (rank, e, me) => {
+    const tr = document.createElement("tr"); if (me) tr.className = "me";
+    [rank, e.name, e.hero || "–", e.world || 1, e.score].forEach((v, j) => { const td = document.createElement("td"); td.textContent = v; if (j === 4) td.className = "num"; tr.append(td); });
     body.append(tr);
+  };
+  list.forEach((e, i) => {
+    const me = !marked && lastEntry && e.name === lastEntry.name && e.score === lastEntry.score;
+    if (me) marked = true;
+    row(i + 1, e, me);
   });
-  note.textContent = src === "online" ? ll("Gemeinsame Bestenliste für alle Geräte.", "Clasificación común para todos los dispositivos.") : ll("Diese Liste ist nur auf diesem Gerät gespeichert. Die gemeinsame Liste wird über Supabase eingerichtet.", "Esta lista solo se guarda en este dispositivo. La lista común se configura con Supabase.");
+  if (lastEntry && !marked && src === "online" && !saveErr) row("…", lastEntry, true);
+  let msg = src === "online" ? ll("Gemeinsame Bestenliste für alle Geräte.", "Clasificación común para todos los dispositivos.") : ll("Diese Liste ist nur auf diesem Gerät gespeichert. Die gemeinsame Liste wird über Supabase eingerichtet.", "Esta lista solo se guarda en este dispositivo. La lista común se configura con Supabase.");
+  if (loadErr) msg = ll(`Die gemeinsame Liste ist gerade nicht erreichbar (Fehler: ${loadErr}). Angezeigt wird die Liste dieses Geräts.`, `La lista común no está disponible ahora (error: ${loadErr}). Se muestra la lista de este dispositivo.`);
+  if (saveErr && lastEntry) msg += " " + ll(`Dein Eintrag konnte nicht in der gemeinsamen Liste gespeichert werden (Fehler: ${saveErr}).`, `Tu entrada no se pudo guardar en la lista común (error: ${saveErr}).`);
+  note.textContent = msg + " · " + BJ_VERSION;
 }
 
 // ======================================================================
